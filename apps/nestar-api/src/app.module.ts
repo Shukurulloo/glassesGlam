@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ConfigModule.forRoot()], // forRoot bu .env ni o'qib beradi
+  imports: [ConfigModule.forRoot()], // forRoot bu .env variable ni o'qib beradi
   controllers: [AppController],
   providers: [AppService],
 })
