@@ -5,4 +5,4 @@ import { PropertyModule } from './property/property.module';
 @Module({
   imports: [MemberModule, PropertyModule]
 })
-export class ComponentsModule {}
+export class ComponentsModule {} // bu ko'prik vazifasida boshqa modullarni olib asosiy app modulga beradi mantiq soddalashadi
