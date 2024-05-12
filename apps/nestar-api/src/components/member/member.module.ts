@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import MemberSchema from '../../schemas/Member.model';
 
 @Module({
-	imports: [MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }])],
+	imports: [MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }])],// object sifatida schemani ulab olamz
 	providers: [MemberResolver, MemberService],
 })
 export class MemberModule {}

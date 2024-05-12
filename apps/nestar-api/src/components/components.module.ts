@@ -11,7 +11,7 @@ import { BoardArticleModule } from './board-article/board-article.module';
 @Module({
 	imports: [
 		MemberModule,
-    AuthModule,
+		AuthModule,
 		PropertyModule,
 		BoardArticleModule,
 		LikeModule,
@@ -19,5 +19,5 @@ import { BoardArticleModule } from './board-article/board-article.module';
 		CommentModule,
 		FollowModule,
 	],
-})
+})// faqat modullarni jamlab beradi
 export class ComponentsModule {} // bu ko'prik vazifasida boshqa modullarni olib asosiy app modulga beradi mantiq soddalashadi
