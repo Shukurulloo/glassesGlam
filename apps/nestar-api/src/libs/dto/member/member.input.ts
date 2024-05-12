@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { IsNotEmpty, IsOptional, Length } from 'class-validator';
 import { MemberAuthType, MemberType } from '../../enums/member.enum';
-
+// bu dto fayl krib kelayotgan data uchn
 @InputType()
 export class MemberInput {
 	@IsNotEmpty()
