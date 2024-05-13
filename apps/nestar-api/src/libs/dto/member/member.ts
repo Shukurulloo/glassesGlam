@@ -20,13 +20,16 @@ export class Member {
 	@Field(() => String)
 	memberPhone: string;
 
+    @Field(() => String)
+	memberNick: string;
+
 	memberPassword?: string;
 
 	@Field(() => String, { nullable: true }) //  nullable bo'lmasligiham mumkin degani
 	memberFullName?: string;
 
 	@Field(() => String)
-	memberImage?: string;
+	memberImage: string;
 
 	@Field(() => String, { nullable: true }) //  nullable bo'lmasligiham mumkin degani
 	memberAddress?: string;
@@ -74,5 +77,5 @@ export class Member {
 	createdAt: Date;
 
 	@Field(() => Date)
-	updatedAt?: Date;
+	updatedAt: Date;
 }
