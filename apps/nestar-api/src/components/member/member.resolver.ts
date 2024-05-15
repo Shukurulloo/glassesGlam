@@ -13,24 +13,14 @@ export class MemberResolver {
 	@Mutation(() => Member) // qaytaradigon qiymati Member dan iborat // chiqish validation
 	public async signup(@Args('input') input: MemberInput): Promise<Member> {
 		// parametrda krib kelgan datani dto si aynan MemberInput bo'lshi shart deymiz
-		try {
 			console.log('Mutation: signup');
 			return this.memberService.signup(input); // memberService objectiga
-		} catch (err) {
-			console.log('Error, signup:', err);
-			throw new InternalServerErrorException(err); // bu 500 codli xatoni auto hosl qilib beradi
-		}
 	}
 
 	@Mutation(() => Member)
 	public async login(@Args('input') input: LoginInput): Promise<Member> {
-		try {
 			console.log('Mutation: login');
 			return this.memberService.login(input);
-		} catch (err) {
-			console.log('Error, login:', err);
-			throw new InternalServerErrorException(err); // bu 500 codli xatoni auto hosl qilib beradi
-		}
 	}
 
 	@Mutation(() => String)
