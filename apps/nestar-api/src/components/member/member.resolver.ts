@@ -9,9 +9,9 @@ import { Member } from '../../libs/dto/member/member';
 @Resolver() // boshqaruvchi
 export class MemberResolver {
 	constructor(private readonly memberService: MemberService) {} // MemberService ni objectga aylantramz
-
-	@Mutation(() => Member) // qaytaradigon qiymati Member dan iborat
-	@UsePipes(ValidationPipe) // to'g'ri data kirishini tekshiramz
+// graphql API
+	@Mutation(() => Member) // qaytaradigon qiymati Member dan iborat // chiqish validation
+	@UsePipes(ValidationPipe) // to'g'ri data kirishini tekshiramz // kirish validation
 	public async signup(@Args('input') input: MemberInput): Promise<Member> {
 		// parametrda krib kelgan datani dto si aynan MemberInput bo'lshi shart deymiz
 		try {

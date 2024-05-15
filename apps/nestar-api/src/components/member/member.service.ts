@@ -14,25 +14,25 @@ export class MemberService {
 	public async signup(input: MemberInput): Promise<Member> {
 		// TODO: Hash password
 
-		try {
+		try { // databace errori o'zgartrish uchun try catchni  ishlatamz
 			const result = await this.memberModel.create(input);
 			// TODO: Authentication via TOKEN
 			return result;
 		} catch (err) {
 			console.log('Error, service.model:', err);
-			throw new BadRequestException(err); // databace errorini o'rniga
+			throw new BadRequestException(err); // databace errorini o'rniga 400 codli err
 		}
 	}
 
 	public async login(input: LoginInput): Promise<Member> {
-		const { memberNick, memberPassword } = input; // yoyib olamz
+		const { memberNick, memberPassword } = input; // yoyib olamz, destruction
 		const response: Member = await this.memberModel
 			.findOne({ memberNick: memberNick })
-			.select('+memberPassword') //select majburiy olib beradi
+			.select('+memberPassword') //select memberPasswordni majburiy olib beradi, yangi usul
 			.exec();
 
 		if (!response || response.memberStatus === MemberStatus.DELETE) { // agar response bo'lmasa yoki o'zini delete qilgan bo'lsa
-			throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
+			throw new InternalServerErrorException(Message.NO_MEMBER_NICK); // libsda bor
 		} else if(response.memberStatus === MemberStatus.BLOCK) { // va yana blok qilingan bo'lsa
 			throw new InternalServerErrorException(Message.BLOCKED_USER);
 		}

@@ -3,11 +3,12 @@ import { ObjectId } from 'mongoose';
 import { MemberAuthType, MemberStatus, MemberType } from '../../enums/member.enum';
 // bu fayl backentdan clientga to'g'ri data chiqishi dto si
 
-@ObjectType() //  dto => data transfer object
+@ObjectType() // bu serverdan clientga yuborilayotganda typelarni yani dtolarni qurish un kerak bo'ladigon decoretor
 export class Member {
 	@Field(() => String) // graphql uchun type
 	_id: ObjectId; // typescript uchun type
 
+    // field => bu graphql uchun type registratsiyasi
 	@Field(() => MemberType)
 	memberType: MemberType;
 
@@ -23,7 +24,7 @@ export class Member {
     @Field(() => String)
 	memberNick: string;
 
-	memberPassword?: string;
+	memberPassword?: string; //graphqlga tanishtrmadik va graphql clientga bu malumotni chiqarib bermaydi
 
 	@Field(() => String, { nullable: true }) //  nullable bo'lmasligiham mumkin degani
 	memberFullName?: string;
@@ -31,10 +32,10 @@ export class Member {
 	@Field(() => String)
 	memberImage: string;
 
-	@Field(() => String, { nullable: true }) //  nullable bo'lmasligiham mumkin degani
+	@Field(() => String, { nullable: true })
 	memberAddress?: string;
 
-	@Field(() => String, { nullable: true }) //  nullable bo'lmasligiham mumkin degani
+	@Field(() => String, { nullable: true }) 
 	memberDesc?: string;
 
 	@Field(() => Int)

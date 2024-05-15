@@ -6,6 +6,6 @@ import MemberSchema from '../../schemas/Member.model';
 
 @Module({
 	imports: [MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }])],// object sifatida schemani ulab olamz
-	providers: [MemberResolver, MemberService],
+	providers: [MemberResolver, MemberService], // MVC
 })
 export class MemberModule {}
