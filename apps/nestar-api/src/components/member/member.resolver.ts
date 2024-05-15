@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { MemberService } from './member.service';
-import { InternalServerErrorException, UsePipes, ValidationPipe } from '@nestjs/common';
+import { InternalServerErrorException} from '@nestjs/common';
 import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
 import { Member } from '../../libs/dto/member/member';
 
@@ -11,7 +11,6 @@ export class MemberResolver {
 	constructor(private readonly memberService: MemberService) {} // MemberService ni objectga aylantramz
 // graphql API
 	@Mutation(() => Member) // qaytaradigon qiymati Member dan iborat // chiqish validation
-	@UsePipes(ValidationPipe) // to'g'ri data kirishini tekshiramz // kirish validation
 	public async signup(@Args('input') input: MemberInput): Promise<Member> {
 		// parametrda krib kelgan datani dto si aynan MemberInput bo'lshi shart deymiz
 		try {
@@ -24,7 +23,6 @@ export class MemberResolver {
 	}
 
 	@Mutation(() => Member)
-	@UsePipes(ValidationPipe)
 	public async login(@Args('input') input: LoginInput): Promise<Member> {
 		try {
 			console.log('Mutation: login');
