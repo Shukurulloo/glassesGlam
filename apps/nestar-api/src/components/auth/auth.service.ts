@@ -3,6 +3,7 @@ import * as bcrypt from 'bcryptjs';
 import { Member } from '../../libs/dto/member/member';
 import { T } from '../../libs/types/common';
 import { JwtService } from '@nestjs/jwt';
+import { shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class AuthService {
@@ -38,6 +39,7 @@ export class AuthService {
 	// tokenni ichida keladigon datani chiqarib beradigon mantiq yani kim murojat qilishi
 	public async verifyToken(token: string): Promise<Member> {
 		const member = await this.jwtService.verifyAsync(token); // memberni qiyamtini olib beradi
+		member._id = shapeIntoMongoObjectId(member._id); // id ni stringdan objectId ga o'zgartramz
 		return member;
 	}
 }
