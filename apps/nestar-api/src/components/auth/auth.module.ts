@@ -9,7 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 		// ro'yhatga olamz
 		JwtModule.register({
 			secret: `${process.env.SECRET_TOKEN}`, // secret codeni integratsiya qilamz
-			signOptions: { expiresIn: '30d' },
+			signOptions: { expiresIn: '30d' }, // 30kun
 		}),
 	],
 	providers: [AuthService],

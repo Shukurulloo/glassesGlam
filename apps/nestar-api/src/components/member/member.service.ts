@@ -12,7 +12,7 @@ export class MemberService {
 	// Memberni inject qili, memberModel schemani ulaymiz, Crud uchun
 	constructor(
 		@InjectModel('Member') private readonly memberModel: Model<Member>,
-		private authService: AuthService, // authServiceni qurib oldik
+		private authService: AuthService, // authService objectini hosl qildik
 	) {}
 
 	public async signup(input: MemberInput): Promise<Member> {
@@ -58,4 +58,13 @@ export class MemberService {
 	public async getMember(): Promise<string> {
 		return 'getMember executed!';
 	}
+
+	public async getAllMembersByAdmin(): Promise<string> {
+		return 'getAllMembersByAdmin executed!';
+	}
+
+	public async updateMemberByAdmin(): Promise<string> {
+		return 'updateMemberByAdmin executed!';
+	}
+
 }
