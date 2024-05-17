@@ -5,16 +5,20 @@ import { Member } from '../../libs/dto/member/member';
 import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
 import { MemberStatus } from '../../libs/enums/member.enum';
 import { Message } from '../../libs/enums/common.enum';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable() // asosiy mantiqlar
 export class MemberService {
-	// Memberni inject qil
-	constructor(@InjectModel('Member') private readonly memberModel: Model<Member>) {} // memberModel schemani ulaymiz, Crud uchun
+	// Memberni inject qili, memberModel schemani ulaymiz, Crud uchun
+	constructor(
+		@InjectModel('Member') private readonly memberModel: Model<Member>,
+		private authService: AuthService, // authServiceni qurib oldik
+	) {}
 
 	public async signup(input: MemberInput): Promise<Member> {
-		// TODO: Hash password
-
-		try { // databace errori o'zgartrish uchun try catchni  ishlatamz
+		input.memberPassword = await this.authService.hashPassword(input.memberPassword); // hash password
+		try {
+			// databace errori o'zgartrish uchun try catchni  ishlatamz
 			const result = await this.memberModel.create(input);
 			// TODO: Authentication via TOKEN
 			return result;
@@ -31,15 +35,17 @@ export class MemberService {
 			.select('+memberPassword') //select memberPasswordni majburiy olib beradi, yangi usul
 			.exec();
 
-		if (!response || response.memberStatus === MemberStatus.DELETE) { // agar response bo'lmasa yoki o'zini delete qilgan bo'lsa
+		if (!response || response.memberStatus === MemberStatus.DELETE) {
+			// agar response bo'lmasa yoki o'zini delete qilgan bo'lsa
 			throw new InternalServerErrorException(Message.NO_MEMBER_NICK); // libsda bor
-		} else if(response.memberStatus === MemberStatus.BLOCK) { // va yana blok qilingan bo'lsa
+		} else if (response.memberStatus === MemberStatus.BLOCK) {
+			// va yana blok qilingan bo'lsa
 			throw new InternalServerErrorException(Message.BLOCKED_USER);
 		}
 
 		// TODO: Compare passwords
-		const isMatch = memberPassword === response.memberPassword; // parol to'g'ri bo'lsa
-		if(!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
+		const isMatch = await this.authService.comparePasswords(input.memberPassword, response.memberPassword)
+		if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
 
 		return response;
 	}

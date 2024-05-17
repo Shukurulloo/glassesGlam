@@ -27,7 +27,7 @@ import { T } from './libs/types/common';
 				// errorni bir formatga keltramz
 				const graphQLFormattedError = {
 					code: error?.extensions.code, // extensionsni ichidagi codni qabul qilamz
-					// 3 turdagi error messageni qolga kiritdik
+					// 3 turdagi error messageni qolga kiritdik, server, pipe, umumiy errorlar
 					message:
 						error?.extensions?.exception?.response?.message || error?.extensions?.response?.message || error?.message,
 				};
