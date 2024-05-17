@@ -19,8 +19,8 @@ export class MemberService {
 		input.memberPassword = await this.authService.hashPassword(input.memberPassword); // hash password
 		try {
 			// databace errori o'zgartrish uchun try catchni  ishlatamz
-			const result = await this.memberModel.create(input);
-			// TODO: Authentication via TOKEN
+			const result = await this.memberModel.create(input); // result memberni qayataradi
+			result.accessToken = await this.authService.createToken(result); // kribkegan resultni ichidan accessToken ni create qilamz
 			return result;
 		} catch (err) {
 			console.log('Error, service.model:', err.message);
@@ -43,9 +43,10 @@ export class MemberService {
 			throw new InternalServerErrorException(Message.BLOCKED_USER);
 		}
 
-		// TODO: Compare passwords
-		const isMatch = await this.authService.comparePasswords(input.memberPassword, response.memberPassword)
+		//  passwordsni solishtramz
+		const isMatch = await this.authService.comparePasswords(input.memberPassword, response.memberPassword);
 		if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
+		response.accessToken = await this.authService.createToken(response); //token create qilamz
 
 		return response;
 	}

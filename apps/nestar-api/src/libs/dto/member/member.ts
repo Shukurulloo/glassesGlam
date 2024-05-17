@@ -8,7 +8,7 @@ export class Member {
 	@Field(() => String) // graphql uchun type
 	_id: ObjectId; // typescript uchun type
 
-    // field => bu graphql uchun type registratsiyasi
+	// field => bu graphql uchun type registratsiyasi
 	@Field(() => MemberType)
 	memberType: MemberType;
 
@@ -21,7 +21,7 @@ export class Member {
 	@Field(() => String)
 	memberPhone: string;
 
-    @Field(() => String)
+	@Field(() => String)
 	memberNick: string;
 
 	memberPassword?: string; //graphqlga tanishtrmadik va graphql clientga bu malumotni chiqarib bermaydi
@@ -35,7 +35,7 @@ export class Member {
 	@Field(() => String, { nullable: true })
 	memberAddress?: string;
 
-	@Field(() => String, { nullable: true }) 
+	@Field(() => String, { nullable: true })
 	memberDesc?: string;
 
 	@Field(() => Int)
@@ -79,4 +79,8 @@ export class Member {
 
 	@Field(() => Date)
 	updatedAt: Date;
+
+	// accessToken uchun
+	@Field(() => String, { nullable: true }) // bu signup yoki login bo'gandagina hosl bo'ladi shuning uchun nullable yozamz
+	accessToken?: string;
 }
