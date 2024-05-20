@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { Member } from '../../libs/dto/member/member';
-import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
-import { MemberStatus } from '../../libs/enums/member.enum';
-import { Message } from '../../libs/enums/common.enum';
+import { Member, Members } from '../../libs/dto/member/member';
+import { AgentsInquiry, LoginInput, MemberInput } from '../../libs/dto/member/member.input';
+import { MemberStatus, MemberType } from '../../libs/enums/member.enum';
+import { Direction, Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { T } from '../../libs/types/common';
@@ -97,7 +97,35 @@ export class MemberService {
 			}
 		}
 
+		// meLiked
+		//mefollowed
 		return targetMember;
+	}
+
+	public async getAgents(memberId: ObjectId, input: AgentsInquiry): Promise<Members> {
+		const { text } = input.search; // text search qilinsa
+		const match: T = { memberType: MemberType.AGENT, memberStatus: MemberStatus.ACTIVE }; //active agentlarni ol
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC }; //kelayotgan inputni ichidan sortni qabul qilamz, yani bo'lsa o'zi bo'lmsa createdAt obtional
+		//dinamic usul: agar kelayotgan inputni ichida direction bo'lsa o'zi bo'lmasa Desc(yuqoridan pastga)
+		if (text) match.memberNick = { $regex: new RegExp(text, 'i') }; // flagini i qilib harfni katta kichik va harflar ketma-ketligi o'xshash bo'lsa ham farqsz qidirishini belgilaymiz
+		console.log('match:', match);
+
+		const result = await this.memberModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					// facet bir nechta aggregate pipelarni bir vaqtni o'zida ishlatishga imkon beradi
+					$facet: {
+						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }], //pagination: talab etilgan agentlarni ro'yhatini olib beradi
+						metaCounter: [{ $count: 'total' }], // ularni jamini hisoblash mumkin
+					},
+				},
+			])
+			.exec();
+		// console.log('result:', result);
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		return result[0];
 	}
 
 	public async getAllMembersByAdmin(): Promise<string> {

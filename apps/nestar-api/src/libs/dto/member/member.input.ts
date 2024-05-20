@@ -1,6 +1,9 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional, Length } from 'class-validator';
+import { Field, InputType, Int } from '@nestjs/graphql';
+import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import { MemberAuthType, MemberType } from '../../enums/member.enum';
+import { availableAgentSorts } from '../../config';
+import { Direction } from '../../enums/common.enum';
+
 // bu dto fayl krib kelayotgan data uchn  dto => data transfer object
 @InputType() //typelarni yani dtolarni qurish un kerak bo'ladigon decoretor
 export class MemberInput {
@@ -9,22 +12,22 @@ export class MemberInput {
 	@Field(() => String) // String qiymat qaytarsin
 	memberNick: string;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@Length(5, 12)
 	@Field(() => String)
 	memberPassword: string;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@Field(() => String)
 	memberPhone: string;
 
-    @IsOptional()
-    @Field(() => MemberType, {nullable: true})  // nullable bo'sh bo'lishi mumkin
-    memberType?: MemberType
+	@IsOptional()
+	@Field(() => MemberType, { nullable: true }) // nullable bo'sh bo'lishi mumkin
+	memberType?: MemberType;
 
-    @IsOptional() // ihtiyoriy
-    @Field(() => MemberAuthType, {nullable: true})  // nullable bo'sh bo'lishi mumkin
-    memberAuthType?: MemberAuthType
+	@IsOptional() // ihtiyoriy
+	@Field(() => MemberAuthType, { nullable: true }) // nullable bo'sh bo'lishi mumkin
+	memberAuthType?: MemberAuthType;
 }
 
 @InputType()
@@ -34,8 +37,41 @@ export class LoginInput {
 	@Field(() => String) // String qiymat qaytarsin
 	memberNick: string;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@Length(5, 12)
 	@Field(() => String)
 	memberPassword: string;
+}
+
+@InputType()
+class AISearch {
+	@IsNotEmpty()
+	@Field(() => String, { nullable: true })
+	text?: string; // search qilayotgan vaqti agentlarni nomlari orqaliham topishmz mumkin
+}
+
+@InputType()
+export class AgentsInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number; // pagenation
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number; // har pageda nechtadan agent bo'lishi kerakligi
+
+	@IsOptional()
+	@IsIn(availableAgentSorts) // IsIn [] ichida bo'lgan qiymatlarnigina qabul qiladi degani
+	@Field(() => String, { nullable: true })
+	sort?: string; // sorting
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	direction?: Direction; // yuqoridan pastga yoki aksi bo'gan filterlar uchun ishlatamz yani eng avval qo'shilgan yoki aksi
+
+	@IsNotEmpty()
+	@Field(() => AISearch)
+	search: AISearch;
 }

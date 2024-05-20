@@ -84,3 +84,18 @@ export class Member {
 	@Field(() => String, { nullable: true }) // bu signup yoki login bo'gandagina hosl bo'ladi shuning uchun nullable yozamz
 	accessToken?: string;
 }
+
+@ObjectType()
+export class TotalCounter {
+	@Field(() => Int, { nullable: true })
+	total: number;
+}
+
+@ObjectType()
+export class Members {
+	@Field(() => [Member])
+	list: Member[];
+
+	@Field(() => [TotalCounter], { nullable: true })
+	metaCounter: TotalCounter[];
+}
