@@ -14,8 +14,7 @@ export class AuthService {
 		return await bcrypt.hash(memberPassword, salt);
 	}
 
-	// login un. paramda pasword va hashed bo'gan pasword
-
+	// login un. 2ta parametr bor unda pasword va hashed bo'gan pasword
 	public async comparePasswords(password: string, hashedPassword: string): Promise<boolean> {
 		return await bcrypt.compare(password, hashedPassword); // compare async bogani un await qildik
 	}

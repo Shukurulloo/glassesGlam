@@ -9,6 +9,7 @@ import { ObjectId } from 'mongoose';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
 
 // query => get,
 // mutation => post
@@ -29,21 +30,11 @@ export class MemberResolver {
 		return this.memberService.login(input);
 	}
 
-	// Authenticated bo'lgan userlar qila oldadi, user,agent, admin
-	@UseGuards(AuthGuard) // auth bo'lgan bo'lsagina keyinga o'tkazadi, intersepteranham avval ishga tushadi
-	@Mutation(() => String)
-	public async updateMember(@AuthMember('_id') memberId: ObjectId): Promise<string> {
-		// @AuthMember() custom decorator orqali authMember(login bo'gan user malumoti) qabul qilamz
-		console.log('Mutation: updateMember');
-		return this.memberService.updateMember();
-	}
-
 	@UseGuards(AuthGuard)
 	@Mutation(() => String)
 	public async checkAuth(@AuthMember('memberNick') memberNick: string): Promise<string> {
 		console.log('Mutation: checkAuth');
 		console.log('memberNick:', memberNick);
-
 		return `Hi ${memberNick}`;
 	}
 
@@ -53,6 +44,18 @@ export class MemberResolver {
 	public async checkAuthRoles(@AuthMember() authMember: Member): Promise<string> {
 		console.log('Mutation: RolesGuard');
 		return `Hi ${authMember.memberNick} You are ${authMember.memberType} (memberId: ${authMember._id})`;
+	}
+
+	// Authenticated bo'lgan userlar qila oldadi, user,agent, admin
+	@UseGuards(AuthGuard) // auth bo'lgan bo'lsagina keyinga o'tkazadi, intersepteranham avval ishga tushadi
+	@Mutation(() => Member)
+	public async updateMember(
+		@Args('input') input: MemberUpdate,
+		@AuthMember('_id') memberId: ObjectId, // @AuthMember() custom decorator orqali authMember(login bo'gan user malumoti) qabul qilamz
+	): Promise<Member> {
+		console.log('Mutation: updateMember');
+		delete input._id; // krib kegan inputni idsini o'chiramz o'rniga MemberUpdateni ichidagisini ishlatamz
+		return this.memberService.updateMember(memberId, input);
 	}
 
 	@Query(() => String)

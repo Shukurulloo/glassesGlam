@@ -23,7 +23,7 @@ export class MemberInput {
     memberType?: MemberType
 
     @IsOptional() // ihtiyoriy
-    @Field(() => MemberType, {nullable: true})  // nullable bo'sh bo'lishi mumkin
+    @Field(() => MemberAuthType, {nullable: true})  // nullable bo'sh bo'lishi mumkin
     memberAuthType?: MemberAuthType
 }
 
