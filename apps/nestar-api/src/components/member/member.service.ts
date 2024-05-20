@@ -2,15 +2,14 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Member, Members } from '../../libs/dto/member/member';
-import { AgentsInquiry, LoginInput, MemberInput } from '../../libs/dto/member/member.input';
+import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
 import { MemberStatus, MemberType } from '../../libs/enums/member.enum';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
-import { T } from '../../libs/types/common';
 import { ViewService } from '../view/view.service';
-import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
+import { T } from '../../libs/types/common';
 
 @Injectable() // asosiy mantiqlar
 export class MemberService {
@@ -118,7 +117,7 @@ export class MemberService {
 					// facet bir nechta aggregate pipelarni bir vaqtni o'zida ishlatishga imkon beradi
 					$facet: {
 						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }], //pagination: talab etilgan agentlarni ro'yhatini olib beradi
-						metaCounter: [{ $count: 'total' }], // ularni jamini hisoblash mumkin
+						metaCounter: [{ $count: 'total' }], // databacedagi umimiy memberlar sonini beradi
 					},
 				},
 			])
@@ -128,11 +127,37 @@ export class MemberService {
 		return result[0];
 	}
 
-	public async getAllMembersByAdmin(): Promise<string> {
-		return 'getAllMembersByAdmin executed!';
+	public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {
+		const { memberStatus, memberType, text } = input.search; // text search qilinsa
+		const match: T = {}; // hama turdagi userlar
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC }; //kelayotgan inputni ichidan sortni qabul qilamz, yani bo'lsa o'zi bo'lmsa createdAt obtional
+
+		if (memberStatus) match.memberStatus = memberStatus; // agar memberStatus bo'lsa matchga briktramz
+		if (memberType) match.memberType = memberType; // agar memberType bo'lsa matchga briktramz
+
+		if (text) match.memberNick = { $regex: new RegExp(text, 'i') }; // flagini i qilib harfni katta kichik va harflar ketma-ketligi o'xshash bo'lsa ham farqsz qidirishini belgilaymiz
+		console.log('match:', match);
+
+		const result = await this.memberModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }], //pagination: talab etilgan agentlarni ro'yhatini olib beradi
+						metaCounter: [{ $count: 'total' }], // databacedagi umimiy memberlar soni
+					},
+				},
+			])
+			.exec();
+		// console.log('result:', result);
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		return result[0]; // 0-indexdagi qiymatni qaytaradi
 	}
 
-	public async updateMemberByAdmin(): Promise<string> {
-		return 'updateMemberByAdmin executed!';
+	public async updateMemberByAdmin(input: MemberUpdate): Promise<Member> {
+		const result: Member = await this.memberModel.findByIdAndUpdate({ _id: input._id }, input, { new: true }).exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+		return result;
 	}
 }

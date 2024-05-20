@@ -1,7 +1,7 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
-import { MemberAuthType, MemberType } from '../../enums/member.enum';
-import { availableAgentSorts } from '../../config';
+import { MemberAuthType, MemberStatus, MemberType } from '../../enums/member.enum';
+import { availableAgentSorts, availableMemberSorts } from '../../config';
 import { Direction } from '../../enums/common.enum';
 
 // bu dto fayl krib kelayotgan data uchn  dto => data transfer object
@@ -43,9 +43,11 @@ export class LoginInput {
 	memberPassword: string;
 }
 
+
+/** Agents **/
 @InputType()
 class AISearch {
-	@IsNotEmpty()
+	@IsOptional()
 	@Field(() => String, { nullable: true })
 	text?: string; // search qilayotgan vaqti agentlarni nomlari orqaliham topishmz mumkin
 }
@@ -74,4 +76,49 @@ export class AgentsInquiry {
 	@IsNotEmpty()
 	@Field(() => AISearch)
 	search: AISearch;
+}
+
+
+/**  AllMembers **/
+
+
+@InputType() //qolip
+class MISearch {
+	@IsOptional()
+	@Field(() => MemberStatus, { nullable: true })
+	memberStatus?: MemberStatus;
+
+	@IsOptional()
+	@Field(() => MemberType, { nullable: true })
+	memberType?: MemberType;
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	text?: string; // search qilayotgan vaqti agentlarni nomlari orqaliham topishmz mumkin
+}
+
+@InputType()
+export class MembersInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number; // pagenation
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number; // har pageda nechtadan agent bo'lishi kerakligi
+
+	@IsOptional()
+	@IsIn(availableMemberSorts) // IsIn [] ichida bo'lgan qiymatlarnigina qabul qiladi degani
+	@Field(() => String, { nullable: true })
+	sort?: string; // sorting
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	direction?: Direction; // yuqoridan pastga yoki aksi bo'gan filterlar uchun ishlatamz yani eng avval qo'shilgan yoki aksi
+
+	@IsNotEmpty() // bo'lishi shart
+	@Field(() => MISearch)
+	search: MISearch;
 }
