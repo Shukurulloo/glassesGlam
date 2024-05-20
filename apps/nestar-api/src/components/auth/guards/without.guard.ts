@@ -12,12 +12,12 @@ export class WithoutGuard implements CanActivate {
 			const request = context.getArgByIndex(2).req,
 				bearerToken = request.headers.authorization;
 
-			if (bearerToken) {
+			if (bearerToken) { //agar request qilayotgan member auth bo'lgan bo'lsa auth malumotlarini joylab beradi
 				try {
 					const token = bearerToken.split(' ')[1],
 						authMember = await this.authService.verifyToken(token);
 					request.body.authMember = authMember;
-				} catch (err) {
+				} catch (err) {    // aks holda yani auth bo'magan member request qilsa keyinga o'tkazadi
 					request.body.authMember = null;
 				}
 			} else request.body.authMember = null;

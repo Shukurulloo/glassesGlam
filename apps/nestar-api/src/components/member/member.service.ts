@@ -8,6 +8,9 @@ import { Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { T } from '../../libs/types/common';
+import { ViewService } from '../view/view.service';
+import { ViewInput } from '../../libs/dto/view/view.input';
+import { ViewGroup } from '../../libs/enums/view.enum';
 
 @Injectable() // asosiy mantiqlar
 export class MemberService {
@@ -15,6 +18,7 @@ export class MemberService {
 	constructor(
 		@InjectModel('Member') private readonly memberModel: Model<Member>,
 		private authService: AuthService, // authService objectini hosl qildik
+		private viewService: ViewService,
 	) {}
 
 	public async signup(input: MemberInput): Promise<Member> {
@@ -70,15 +74,28 @@ export class MemberService {
 		return result;
 	}
 
-	public async getMember(targetid: ObjectId): Promise<Member> {
+	//parametrda brinchi memberId tomosha qilayotgan inson, ikkinchi talab etilgan data
+	public async getMember(memberId: ObjectId, targetId: ObjectId): Promise<Member> {
 		const search: T = {
-			_id: targetid,
+			_id: targetId,
 			memberStatus: {
 				$in: [MemberStatus.ACTIVE, MemberStatus.BLOCK], // atvive va block bo'gan userlarni ko'rsatadi
 			},
 		};
-		const targetMember = await this.memberModel.findOne(search).exec();
+		const targetMember = await this.memberModel.findOne(search).lean().exec(); // lean: dokumentni javscriptni objectiga aylantradi
 		if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		if (memberId) {
+			//auth bo'gan user bo'lsa
+			// memberId-kimTomoshaQilishi.    targetId-qaysiMemberniTomoshaQilishimz. ViewGroup.MEMBERniTomoshaQiladi
+			const viewInput = { memberId: memberId, viewRefId: targetId, viewGroup: ViewGroup.MEMBER };
+			const newView = await this.viewService.recordView(viewInput); //yangi viewHoslQilamz
+			if (newView) {
+				// agar yangi viewHosl bo'lsa viewni 1taga oshir
+				await this.memberModel.findOneAndUpdate(search, { $inc: { memberViews: 1 } }, { new: true }).exec();
+				targetMember.memberViews++; // lean orqali targetMemberni qiymatini oshiramz
+			}
+		}
 
 		return targetMember;
 	}
