@@ -25,6 +25,7 @@ export enum Direction {
 	ASC = 1, // yuqoridan pastga
 	DESC = -1, // pastdan yuqoriga
 }
-registerEnumType(Direction, { // graohQL ga ro'yhatga olamz
+registerEnumType(Direction, {
+	// graohQL ga ro'yhatga olamz
 	name: 'Direction',
 });
