@@ -10,7 +10,7 @@ import * as path from 'path';
 
 export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg']; // img formati
 export const getSerialForImage = (filename: string) => { //random name
-	const ext = path.parse(filename).ext;
+	const ext = path.parse(filename).ext;   //extension ni .jpg kabi formatini biriktiramz
 	return uuidv4() + ext;
 };
 

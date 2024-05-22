@@ -31,7 +31,7 @@ export class PropertyInput {
 
 	@IsNotEmpty()
 	@Field(() => Number)
-	propertySquare: number;
+	propertySquare: number; // Square
 
 	@IsNotEmpty()
 	@IsInt()

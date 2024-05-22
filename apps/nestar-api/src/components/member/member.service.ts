@@ -160,14 +160,14 @@ export class MemberService {
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 		return result;
 	}
-
+ // memberPropertiesni 1ga oshirib beradi
 	public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
 		const { _id, targetKey, modifier } = input;
 		return await this.memberModel
 			.findByIdAndUpdate(
 				_id,
 				{
-					$inc: { [targetKey]: modifier },
+					$inc: { [targetKey]: modifier }, //  operatori qiymatlarni o'zgartiradi, ularni qo'shadi yoki ayiradi.
 				},
 				{ new: true },
 			)

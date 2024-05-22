@@ -2,6 +2,7 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
 import { MemberAuthType, MemberStatus, MemberType } from '../../enums/member.enum';
 import { PropertyLocation, PropertyStatus, PropertyType } from '../../enums/property.enum';
+import { Member } from '../member/member';
 // bu fayl backentdan clientga to'g'ri data chiqishi dto si
 
 @ObjectType() // bu serverdan clientga yuborilayotganda typelarni yani dtolarni qurish un kerak bo'ladigon decoretor
@@ -31,22 +32,22 @@ export class Property {
 	propertySquare: number;
 
 	@Field(() => Int)
-	propertyBeds: string;
+	propertyBeds: number;
 
 	@Field(() => Int)
-	propertyRooms: string;
+	propertyRooms: number;
 
 	@Field(() => Int)
-	propertyViews: string;
+	propertyViews: number;
 
 	@Field(() => Int)
-	propertyLikes: string;
+	propertyLikes: number;
 
 	@Field(() => Int)
-	propertyComments: string;
+	propertyComments: number;
 
 	@Field(() => Int)
-	propertyRank: string;
+	propertyRank: number;
 
 	@Field(() => [String])
 	propertyImages: string[];
@@ -78,4 +79,9 @@ export class Property {
 
 	@Field(() => Date)
 	updatedAt: Date;
+
+	/** from aggregation **/
+
+	@Field(() => Member, {nullable: true} )
+	memberData?: Member
 }

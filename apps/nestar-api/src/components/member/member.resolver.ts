@@ -72,12 +72,11 @@ export class MemberResolver {
 		return await this.memberService.getMember(memberId, targetid);
 	}
 
-
 	@UseGuards(WithoutGuard) // authorisation
 	@Query(() => Members)
 	public async getAgents(@Args('input') input: AgentsInquiry, @AuthMember('_id') memberId: ObjectId): Promise<Members> {
 		console.log('Query: getAgents');
-	return await this.memberService.getAgents(memberId, input);
+		return await this.memberService.getAgents(memberId, input);
 	}
 
 	/** ADMIN **/
@@ -103,69 +102,71 @@ export class MemberResolver {
 	/** UPLOADER **/
 
 	@UseGuards(AuthGuard)
-@Mutation((returns) => String)
-public async imageUploader( // 1ta image
-	@Args({ name: 'file', type: () => GraphQLUpload }) // file nomi bn, GraphQLUpload typesi bn
-{ createReadStream, filename, mimetype }: FileUpload,  // FileUploadni ichidan unga tegshli datalar(type)ni olamz, distraction
-@Args('target') target: String, // target orqali serverga yuborilgan imggni qayerga saqlashini belgilaymiz
-): Promise<string> {
-	console.log('Mutation: imageUploader');
+	@Mutation((returns) => String)
+	public async imageUploader(
+		// 1ta image
+		@Args({ name: 'file', type: () => GraphQLUpload }) // file nomi bn, GraphQLUpload typesi bn
+		{ createReadStream, filename, mimetype }: FileUpload, // FileUploadni ichidan unga tegshli datalar(type)ni olamz, distraction
+		@Args('target') target: String, // target orqali serverga yuborilgan imggni qayerga saqlashini belgilaymiz
+	): Promise<string> {
+		console.log('Mutation: imageUploader');
 
-	if (!filename) throw new Error(Message.UPLOAD_FAILED); // check
-const validMime = validMimeTypes.includes(mimetype); // img formatni ichida mimetype borligi
-if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT); // check
+		if (!filename) throw new Error(Message.UPLOAD_FAILED); // check
+		const validMime = validMimeTypes.includes(mimetype); // img formatni ichida mimetype borligi
+		if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT); // check
 
-const imageName = getSerialForImage(filename); //random name
-const url = `uploads/${target}/${imageName}`; // uploads folderini target nomli folderiga saqlasin
-const stream = createReadStream(); // createReadStream orqali folder ochiladi
+		const imageName = getSerialForImage(filename); //random name
+		const url = `uploads/${target}/${imageName}`; // uploads folderini target nomli folderiga saqlasin
+		const stream = createReadStream(); // createReadStream orqali folder ochiladi
 
-const result = await new Promise((resolve, reject) => {
-	stream
-		.pipe(createWriteStream(url))// hosil qilingan url paas qilinadi
-		.on('finish', async () => resolve(true)) // muofaqiyatli bo'lsa resolve ishga tushadi
-		.on('error', () => reject(false)); // error bolsa false
-});
-if (!result) throw new Error(Message.UPLOAD_FAILED);
+		const result = await new Promise((resolve, reject) => {
+			stream
+				.pipe(createWriteStream(url)) // hosil qilingan url paas qilinadi //databaceda ochamz
+				.on('finish', async () => resolve(true)) // muofaqiyatli bo'lsa resolve ishga tushadi
+				.on('error', () => reject(false)); // error bolsa false
+		});
+		if (!result) throw new Error(Message.UPLOAD_FAILED);
 
-return url; // yuklangan manzilni return qilamz
-}
+		return url; // yuklangan manzilni return qilamz
+	}
 
-@UseGuards(AuthGuard)
-@Mutation((returns) => [String])
-public async imagesUploader( // 1dan ko'p property images
-	@Args('files', { type: () => [GraphQLUpload] })
-files: Promise<FileUpload>[],
-@Args('target') target: String,
-): Promise<string[]> {
-	console.log('Mutation: imagesUploader');
+	@UseGuards(AuthGuard)
+	@Mutation((returns) => [String])
+	public async imagesUploader(
+		// 1dan ko'p property images
+		@Args('files', { type: () => [GraphQLUpload] })
+		files: Promise<FileUpload>[],
+		@Args('target') target: String,
+	): Promise<string[]> {
+		console.log('Mutation: imagesUploader');
 
-	const uploadedImages = [];
-	const promisedList = files.map(async (img: Promise<FileUpload>, index: number): Promise<Promise<void>> => {
-		try {
-			const { filename, mimetype, encoding, createReadStream } = await img;
+		const uploadedImages = [];
+		const promisedList = files.map(async (img: Promise<FileUpload>, index: number): Promise<Promise<void>> => {
+			try {
+				const { filename, mimetype, encoding, createReadStream } = await img;
 
-			const validMime = validMimeTypes.includes(mimetype);
-			if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+				const validMime = validMimeTypes.includes(mimetype);
+				if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
 
-			const imageName = getSerialForImage(filename);
-			const url = `uploads/${target}/${imageName}`;
-			const stream = createReadStream();
+				const imageName = getSerialForImage(filename);
+				const url = `uploads/${target}/${imageName}`;
+				const stream = createReadStream();
 
-			const result = await new Promise((resolve, reject) => {
-				stream
-					.pipe(createWriteStream(url))
-					.on('finish', () => resolve(true))
-					.on('error', () => reject(false));
-			});
-			if (!result) throw new Error(Message.UPLOAD_FAILED);
+				const result = await new Promise((resolve, reject) => {
+					stream
+						.pipe(createWriteStream(url))
+						.on('finish', () => resolve(true))
+						.on('error', () => reject(false));
+				});
+				if (!result) throw new Error(Message.UPLOAD_FAILED);
 
-			uploadedImages[index] = url;
-		} catch (err) {
-			console.log('Error, file missing!');
-		}
-	});
+				uploadedImages[index] = url;
+			} catch (err) {
+				console.log('Error, file missing!');
+			}
+		});
 
-	await Promise.all(promisedList);
-	return uploadedImages;
-}
+		await Promise.all(promisedList); //hammasini yuklashini taminlaydi
+		return uploadedImages;
+	}
 }
