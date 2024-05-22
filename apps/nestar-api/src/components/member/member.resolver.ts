@@ -104,35 +104,35 @@ export class MemberResolver {
 
 	@UseGuards(AuthGuard)
 @Mutation((returns) => String)
-public async imageUploader(
-	@Args({ name: 'file', type: () => GraphQLUpload })
-{ createReadStream, filename, mimetype }: FileUpload,
-@Args('target') target: String,
+public async imageUploader( // 1ta image
+	@Args({ name: 'file', type: () => GraphQLUpload }) // file nomi bn, GraphQLUpload typesi bn
+{ createReadStream, filename, mimetype }: FileUpload,  // FileUploadni ichidan unga tegshli datalar(type)ni olamz, distraction
+@Args('target') target: String, // target orqali serverga yuborilgan imggni qayerga saqlashini belgilaymiz
 ): Promise<string> {
 	console.log('Mutation: imageUploader');
 
-	if (!filename) throw new Error(Message.UPLOAD_FAILED);
-const validMime = validMimeTypes.includes(mimetype);
-if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+	if (!filename) throw new Error(Message.UPLOAD_FAILED); // check
+const validMime = validMimeTypes.includes(mimetype); // img formatni ichida mimetype borligi
+if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT); // check
 
-const imageName = getSerialForImage(filename);
-const url = `uploads/${target}/${imageName}`;
-const stream = createReadStream();
+const imageName = getSerialForImage(filename); //random name
+const url = `uploads/${target}/${imageName}`; // uploads folderini target nomli folderiga saqlasin
+const stream = createReadStream(); // createReadStream orqali folder ochiladi
 
 const result = await new Promise((resolve, reject) => {
 	stream
-		.pipe(createWriteStream(url))
-		.on('finish', async () => resolve(true))
-		.on('error', () => reject(false));
+		.pipe(createWriteStream(url))// hosil qilingan url paas qilinadi
+		.on('finish', async () => resolve(true)) // muofaqiyatli bo'lsa resolve ishga tushadi
+		.on('error', () => reject(false)); // error bolsa false
 });
 if (!result) throw new Error(Message.UPLOAD_FAILED);
 
-return url;
+return url; // yuklangan manzilni return qilamz
 }
 
 @UseGuards(AuthGuard)
 @Mutation((returns) => [String])
-public async imagesUploader(
+public async imagesUploader( // 1dan ko'p image
 	@Args('files', { type: () => [GraphQLUpload] })
 files: Promise<FileUpload>[],
 @Args('target') target: String,
