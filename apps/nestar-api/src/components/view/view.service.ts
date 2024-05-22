@@ -8,7 +8,7 @@ import { T } from '../../libs/types/common';
 // view hosl qilish mantig'i
 @Injectable()
 export class ViewService {
-	constructor(@InjectModel('View') private readonly viewModel: Model<View>) {} // viewModelni qo'lga oldik
+	constructor(@InjectModel('View') private readonly viewModel: Model<View>) {} // viewSchemaModelni qo'lga oldik
 
 	public async recordView(input: ViewInput): Promise<View | null> {
 		const viewExist = await this.checkViewExistence(input);
