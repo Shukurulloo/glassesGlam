@@ -132,7 +132,7 @@ return url; // yuklangan manzilni return qilamz
 
 @UseGuards(AuthGuard)
 @Mutation((returns) => [String])
-public async imagesUploader( // 1dan ko'p image
+public async imagesUploader( // 1dan ko'p property images
 	@Args('files', { type: () => [GraphQLUpload] })
 files: Promise<FileUpload>[],
 @Args('target') target: String,
