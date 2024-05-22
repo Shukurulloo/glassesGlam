@@ -9,7 +9,7 @@ import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { ViewService } from '../view/view.service';
 import { ViewGroup } from '../../libs/enums/view.enum';
-import { T } from '../../libs/types/common';
+import { StatisticModifier, T } from '../../libs/types/common';
 
 @Injectable() // asosiy mantiqlar
 export class MemberService {
@@ -159,5 +159,18 @@ export class MemberService {
 		const result: Member = await this.memberModel.findByIdAndUpdate({ _id: input._id }, input, { new: true }).exec();
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 		return result;
+	}
+
+	public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
+		const { _id, targetKey, modifier } = input;
+		return await this.memberModel
+			.findByIdAndUpdate(
+				_id,
+				{
+					$inc: { [targetKey]: modifier },
+				},
+				{ new: true },
+			)
+			.exec();
 	}
 }
