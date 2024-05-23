@@ -3,7 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Properties, Property } from '../../libs/dto/property/property';
 import { Direction, Message } from '../../libs/enums/common.enum';
-import { AgentPropertiesInquiry, AllPropertiesInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
+import {
+	AgentPropertiesInquiry,
+	AllPropertiesInquiry,
+	PropertiesInquiry,
+	PropertyInput,
+} from '../../libs/dto/property/property.input';
 import { MemberService } from '../member/member.service';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { PropertyStatus } from '../../libs/enums/property.enum';
@@ -78,7 +83,7 @@ export class PropertyService {
 	}
 
 	public async updateProperty(memberId: ObjectId, input: PropertyUpdate): Promise<Property> {
-		let { propertyStatus, soldAt, deleteAt } = input;
+		let { propertyStatus, soldAt, deletedAt: deletedAt } = input;
 		const search: T = {
 			_id: input._id,
 			memberId: memberId,
@@ -86,7 +91,7 @@ export class PropertyService {
 		};
 
 		if (propertyStatus === PropertyStatus.SOLD) soldAt = moment().toDate();
-		else if (propertyStatus === PropertyStatus.DELETE) deleteAt = moment().toDate();
+		else if (propertyStatus === PropertyStatus.DELETE) deletedAt = moment().toDate();
 
 		const result = await this.propertyModel
 			.findOneAndUpdate(search, input, {
@@ -95,7 +100,7 @@ export class PropertyService {
 			.exec();
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-		if (soldAt || deleteAt) {
+		if (soldAt || deletedAt) {
 			await this.memberService.memberStatsEditor({
 				_id: memberId,
 				targetKey: 'memberProperties',
@@ -226,5 +231,33 @@ export class PropertyService {
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		return result[0]; // 0-indexdagi qiymatni qaytaradi
+	}
+
+	public async updatePropertyByAdmin(input: PropertyUpdate): Promise<Property> {
+		let { propertyStatus, soldAt, deletedAt } = input;
+		const search: T = {
+			_id: input._id,
+			propertyStatus: PropertyStatus.ACTIVE,
+		};
+
+		if (propertyStatus === PropertyStatus.SOLD) soldAt = moment().toDate();
+		else if (propertyStatus === PropertyStatus.DELETE) deletedAt = moment().toDate();
+
+		const result = await this.propertyModel
+			.findOneAndUpdate(search, input, {
+				new: true,
+			})
+			.exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+		if (soldAt || deletedAt) {
+			await this.memberService.memberStatsEditor({
+				_id: result.memberId,
+				targetKey: 'memberProperties',
+				modifier: -1,
+			});
+		}
+
+		return result;
 	}
 }
