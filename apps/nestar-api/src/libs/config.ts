@@ -3,7 +3,6 @@ import { ObjectId } from 'bson'; // mongooseni o'rniga bson dan foydalanib objec
 // shular bo'yicha sort qilsin degan mantiq
 export const availableAgentSorts = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews', 'memberRank']; // agents
 export const availableMemberSorts = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews']; // all
-
 export const availableOptions = ['propertyBarter', 'propertyRent'];
 export const availablePropertySorts = [
 	'createdAt',
@@ -13,8 +12,8 @@ export const availablePropertySorts = [
 	'propertyRank',
 	'propertyPrice',
 ];
-
 export const availableBoardArticleSorts = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews']
+export const availableCommentSorts = ['createdAt', 'updatedAt']
 
 /**  IMAGE CONFIGURATION **/
 import { v4 as uuidv4 } from 'uuid';
