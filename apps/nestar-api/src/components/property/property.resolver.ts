@@ -17,6 +17,9 @@ import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { PropertyUpdate } from '../../libs/dto/property/property.update';
 
+
+// query => get,
+// mutation => post
 @Resolver()
 export class PropertyResolver {
 	constructor(private readonly propertyService: PropertyService) {}
@@ -35,11 +38,11 @@ export class PropertyResolver {
 		return await this.propertyService.createProperty(input);
 	}
 
-	@UseGuards(WithoutGuard)
+	@UseGuards(WithoutGuard)// ihtiyoriy member
 	@Query((returns) => Property)
 	public async getProperty(
 		@Args('propertyId') input: string,
-		@AuthMember('_id') memberId: ObjectId,
+		@AuthMember('_id') memberId: ObjectId, // agar authenticed bo'gan member bo'lsa uni id sini olamz
 	): Promise<Property> {
 		console.log('Query: getProperty');
 		const propertyId = shapeIntoMongoObjectId(input);
@@ -51,7 +54,7 @@ export class PropertyResolver {
 	@Mutation((returns) => Property)
 	public async updateProperty(
 		@Args('input') input: PropertyUpdate,
-		@AuthMember('_id') memberId: ObjectId,
+		@AuthMember('_id') memberId: ObjectId, // @AuthMember() custom decorator orqali authMember(login bo'gan user malumoti) qabul qilamz
 	): Promise<Property> {
 		console.log('Mutation: updateProperty');
 		input._id = shapeIntoMongoObjectId(input._id);

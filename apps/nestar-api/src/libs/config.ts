@@ -29,11 +29,12 @@ export const shapeIntoMongoObjectId = (target: any) => {
 	return typeof target === 'string' ? new ObjectId(target) : target; //shart: agar string bo'lsa ObjectIdga wrap qilsin aks holda  targetni o'zini qaytarsin
 };
 
+// authenticed bo'gan user bo'lsa uni 
 export const lookupMember = {
 	$lookup: {
-		from: 'members',
+		from: 'members', // qaysi collectiondan qayerdan izlash
 		localField: 'memberId',
-		foreignField: '_id',
-		as: 'memberData',
+		foreignField: '_id', // _id bo'yicha
+		as: 'memberData', // nomini memberData qilib qaytar
 	},
 };

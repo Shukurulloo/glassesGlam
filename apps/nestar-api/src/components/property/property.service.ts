@@ -47,6 +47,7 @@ export class PropertyService {
 
 	public async getProperty(memberId: ObjectId, propertyId: ObjectId): Promise<Property> {
 		const search: T = {
+			//biz ko'rmoqchi bo'gan data
 			_id: propertyId,
 			propertyStatus: PropertyStatus.ACTIVE,
 		};
@@ -55,31 +56,20 @@ export class PropertyService {
 		if (!targetProperty) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		if (memberId) {
-			const viewInput = { memberId: memberId, viewRefId: propertyId, viewGroup: ViewGroup.PROPERTY };
-			const newView = await this.viewService.recordView(viewInput);
+			// agar authenticed bo'gan member bo'lsa
+			const viewInput = { memberId: memberId, viewRefId: propertyId, viewGroup: ViewGroup.PROPERTY }; //view bo'ganini dalolat qiladigon logni hosl qilamz, // kimTomoshaQilishi.qaysiMemberniTomoshaQilishimz. uniTomoshaQiladi
+			const newView = await this.viewService.recordView(viewInput); //yangi viewHoslQilamz
 			if (newView) {
+				// agar yangi view hosl bo'lsa quyida propertyni statistic datalarini yangilaydigon method hosl qildik
 				await this.propertyStatsEditor({ _id: propertyId, targetKey: 'propertyViews', modifier: 1 });
-				targetProperty.propertyViews++;
+				targetProperty.propertyViews++; // lean orqali targetMemberni qiymatini oshiramz
 			}
 
-			// meLiked
+			// meLiked => shu propetyga biz like bosganmizmi? tekshiramz
 		}
-
+		// targetProperty ni  memberDatasini hosl qildik
 		targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);
 		return targetProperty;
-	}
-
-	public async propertyStatsEditor(input: StatisticModifier): Promise<Property> {
-		const { _id, targetKey, modifier } = input;
-		return await this.propertyModel
-			.findByIdAndUpdate(
-				_id,
-				{ $inc: { [targetKey]: modifier } },
-				{
-					new: true,
-				},
-			)
-			.exec();
 	}
 
 	public async updateProperty(memberId: ObjectId, input: PropertyUpdate): Promise<Property> {
@@ -100,7 +90,7 @@ export class PropertyService {
 			.exec();
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-		if (soldAt || deletedAt) {
+		if (soldAt || deletedAt) { // u yoki bu bo'lsa -1
 			await this.memberService.memberStatsEditor({
 				_id: memberId,
 				targetKey: 'memberProperties',
@@ -124,12 +114,12 @@ export class PropertyService {
 				{ $sort: sort },
 				{
 					$facet: {
-						list: [
+						list: [ // list orqali chiqaradi
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
 							//meLiked
-							lookupMember,
-							{ $unwind: '$memberData' },
+							lookupMember, // qidirsh
+							{ $unwind: '$memberData' }, // memberDatani [] arraydan chiqarib olamz chunki (1ta)single dok bo'lgani uchun
 						],
 						metaCounter: [{ $count: 'total' }], // databacedagi umimiy property sonini beradi
 					},
@@ -142,6 +132,7 @@ export class PropertyService {
 
 	private shapeMatchQuery(match: T, input: PropertiesInquiry): void {
 		const {
+			//bo'lishi shart
 			memberId,
 			locationList,
 			roomsList,
@@ -153,18 +144,22 @@ export class PropertyService {
 			options,
 			text,
 		} = input.search;
-		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
-		if (locationList) match.propertyLocation = { $in: locationList };
-		if (roomsList) match.propertyRooms = { $in: roomsList };
+		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId); // agar matchni ichida id bo'lsa shape qilamz
+		if (locationList) match.propertyLocation = { $in: locationList }; // agar matchni ichida propertyLocation
+		if (roomsList) match.propertyRooms = { $in: roomsList }; // agar roomsList bo'lsa matchga briktramz
 		if (bedsList) match.propertyBeds = { $in: bedsList };
 		if (typeList) match.propertyType = { $in: typeList };
-
+		// mongoDB Moongose
+		// $in => bo'lsa, operatori MongoDB da kolleksiyadagi hujjatlarni filtrlaydi
+		// $gte => dan yuqori 
+		// $lte => unga kichkina yoki teng
+		// $or => 
 		if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
 		if (squaresRange) match.propertySquare = { $gte: squaresRange.start, $lte: squaresRange.end };
 
-		if (text) match.propertyTitle = { $regex: new RegExp(text, 'i') };
-		if (options) {
+		if (text) match.propertyTitle = { $regex: new RegExp(text, 'i') }; // izlaganda bosh harfimi farqsz qidirsh
+		if (options) { // u yoki bu qiymatlaridan kamida bittasi true bo'lgan hujjatlarni qidir.
 			match['$or'] = options.map((ele) => {
 				return { [ele]: true };
 			});
@@ -173,11 +168,11 @@ export class PropertyService {
 
 	public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInquiry): Promise<Properties> {
 		const { propertyStatus } = input.search;
-		if (propertyStatus === PropertyStatus.DELETE) throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
+		if (propertyStatus === PropertyStatus.DELETE) throw new BadRequestException(Message.NOT_ALLOWED_REQUEST); // agar DELETE bo'lsa ololmaydi
 
 		const match: T = {
 			memberId: memberId,
-			propertyStatus: propertyStatus ?? { $ne: PropertyStatus.DELETE },
+			propertyStatus: propertyStatus ?? { $ne: PropertyStatus.DELETE }, // DELETE bo'lmagan
 		};
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
@@ -190,7 +185,7 @@ export class PropertyService {
 						list: [
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
-							lookupMember,
+							lookupMember, //
 							{ $unwind: '$memberData' },
 						],
 						metaCounter: [{ $count: 'total' }],
@@ -229,7 +224,6 @@ export class PropertyService {
 			])
 			.exec();
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-
 		return result[0]; // 0-indexdagi qiymatni qaytaradi
 	}
 
@@ -267,5 +261,20 @@ export class PropertyService {
 		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 
 		return result;
+	}
+
+	//propertyni statistic datalarini yangilaydigon method hosl qildik
+	public async propertyStatsEditor(input: StatisticModifier): Promise<Property> {
+		// StatisticModifier bu collectionni ihtiyoriy dokni o'zgartrishda hizmatga keladigon interface
+		const { _id, targetKey, modifier } = input;
+		return await this.propertyModel
+			.findByIdAndUpdate(
+				_id,
+				{ $inc: { [targetKey]: modifier } },
+				{
+					new: true,
+				},
+			)
+			.exec();
 	}
 }
