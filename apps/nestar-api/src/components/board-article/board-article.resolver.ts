@@ -19,7 +19,7 @@ export class BoardArticleResolver {
 
 	@UseGuards(AuthGuard)
 	@Mutation((returns) => BoardArticle)
-	public async createBoardArticle(
+	public async createBoardArticle( // maqola
 		@Args('input') input: BoardArticleInput,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<BoardArticle> {

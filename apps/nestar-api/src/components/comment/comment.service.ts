@@ -22,7 +22,7 @@ export class CommentService {
 	) {}
 
 	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
-		input.memberId = memberId;
+		input.memberId = memberId; // murojatchini inputni ichiga joylaymiz
 
 		let result = null;
 
@@ -33,7 +33,7 @@ export class CommentService {
 			throw new BadRequestException(Message.CREATE_FAILED);
 		}
 
-		switch (input.commentGroup) {
+		switch (input.commentGroup) { // kondishon orqali 3tasiga comment yozamz
 			case CommentGroup.PROPERTY:
 				await this.propertyService.propertyStatsEditor({
 					_id: input.commentRefId,
@@ -74,7 +74,7 @@ export class CommentService {
 			},
 			input,
 			{ new: true },
-		);
+		).exec();
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
 		return result;
@@ -89,7 +89,7 @@ export class CommentService {
 			{ $match: match },
 			{ $sort: sort },
 			{
-				$facet: {
+				$facet: { //aggregation sistemni ikkiga bo'lyapmiz
 					list: [
 						{ $skip: (input.page - 1) * input.limit },
 						{ $limit: input.limit },
@@ -109,6 +109,7 @@ export class CommentService {
 
     public async removeCommentByAdmin(input: ObjectId): Promise<Comment> {
 		const result = await this.commentModel.findByIdAndDelete(input);
+
 		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 		return result;
 	}

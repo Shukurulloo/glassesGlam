@@ -4,7 +4,7 @@ import { ObjectId } from 'mongoose';
 import { BoardArticleCategory, BoardArticleStatus } from '../../enums/board-article.enum';
 import { Direction } from '../../enums/common.enum';
 import { availableBoardArticleSorts } from '../../config';
-
+// dtoni 2xil maqsadda ishlatamz himoya va interface
 @InputType()
 export class BoardArticleInput {
 	@IsNotEmpty()

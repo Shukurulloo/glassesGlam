@@ -9,8 +9,8 @@ import { PropertyModule } from '../property/property.module';
 import { BoardArticleModule } from '../board-article/board-article.module';
 
 @Module({
-  imports: [
-		MongooseModule.forFeature([
+  imports: [ 
+		MongooseModule.forFeature([ // object sifatida schemani ulab olamz,
 			{
 				name: 'Comment',
 				schema: CommentSchema,
