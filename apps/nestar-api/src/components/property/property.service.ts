@@ -70,6 +70,8 @@ export class PropertyService {
 			}
 
 			// meLiked => shu propetyga biz like bosganmizmi? tekshiramz
+			const likeInput = { memberId: memberId, likeRefId: propertyId, likeGroup: LikeGroup.PROPERTY };
+			targetProperty.meLiked = await this.likeService.checkLikeExistence(likeInput);
 		}
 		// targetProperty ni  memberDatasini hosl qildik
 		targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);

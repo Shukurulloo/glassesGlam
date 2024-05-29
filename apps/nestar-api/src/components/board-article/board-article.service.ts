@@ -66,7 +66,9 @@ export class BoardArticleService {
 				targetBoardArticle.articleViews++;
 			}
 
-			//meLiked
+			// meLiked => shu propetyga biz like bosganmizmi? tekshiramz
+			const likeInput = { memberId: memberId, likeRefId: articleId, likeGroup: LikeGroup.ARTICLE };
+			targetBoardArticle.meLiked = await this.likeService.checkLikeExistence(likeInput);
 		} // targetBoardArticle ni  memberDatasini hosl qildik.
 		targetBoardArticle.memberData = await this.memberService.getMember(null, targetBoardArticle.memberId); // null: memberni chaqirsak uni viewni oshirib qo'ymasligi un yani uni pagesiga bormasdan turip view +1 qilmasligi un
 

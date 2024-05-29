@@ -3,6 +3,7 @@ import { ObjectId } from 'mongoose';
 import { MemberAuthType, MemberStatus, MemberType } from '../../enums/member.enum';
 import { PropertyLocation, PropertyStatus, PropertyType } from '../../enums/property.enum';
 import { Member, TotalCounter } from '../member/member';
+import { MeLiked } from '../like/like';
 // bu fayl backentdan clientga to'g'ri data chiqishi dto si
 
 @ObjectType() // bu serverdan clientga yuborilayotganda typelarni yani dtolarni qurish un kerak bo'ladigon decoretor
@@ -82,8 +83,12 @@ export class Property {
 
 	/** from aggregation **/
 
+	@Field(() => [MeLiked], { nullable: true })
+	meLiked?: MeLiked[];
+
 	@Field(() => Member, { nullable: true })
 	memberData?: Member;
+
 }
 
 @ObjectType()

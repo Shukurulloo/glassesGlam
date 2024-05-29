@@ -101,6 +101,9 @@ export class MemberService {
 		}
 
 		// meLiked
+		const likeInput = { memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER };
+		targetMember.meLiked = await this.likeService.checkLikeExistence(likeInput);
+
 		//mefollowed
 		return targetMember;
 	}
@@ -140,12 +143,12 @@ export class MemberService {
 			likeRefId: likeRefId,
 			likeGroup: LikeGroup.MEMBER, // memberlarga like
 		};
-		
+
 		const modifier: number = await this.likeService.toggleLike(input); //likeService
 		const result = await this.memberStatsEditor({ _id: likeRefId, targetKey: 'memberLikes', modifier: modifier }); // memberni static datasi yangilanadi
 
-		if(!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG)
-		return result
+		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+		return result;
 	}
 
 	public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {

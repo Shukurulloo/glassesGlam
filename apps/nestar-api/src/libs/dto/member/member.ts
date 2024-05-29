@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
 import { MemberAuthType, MemberStatus, MemberType } from '../../enums/member.enum';
+import { MeLiked } from '../like/like';
 // bu fayl backentdan clientga to'g'ri data chiqishi dto si
 
 @ObjectType() // bu serverdan clientga yuborilayotganda typelarni yani dtolarni qurish un kerak bo'ladigon decoretor
@@ -83,6 +84,10 @@ export class Member {
 	// accessToken uchun
 	@Field(() => String, { nullable: true }) // bu signup yoki login bo'gandagina hosl bo'ladi shuning uchun nullable yozamz
 	accessToken?: string;
+
+	/** from aggregation */
+	@Field(() => [MeLiked], { nullable: true })
+	meLiked?: MeLiked[];
 }
 
 @ObjectType()
