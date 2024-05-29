@@ -10,6 +10,9 @@ import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { ViewService } from '../view/view.service';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
+import { LikeInput } from '../../libs/dto/like/like.input';
+import { LikeGroup } from '../../libs/enums/like.enum';
+import { LikeService } from '../like/like.service';
 
 @Injectable() // asosiy mantiqlar
 export class MemberService {
@@ -18,6 +21,7 @@ export class MemberService {
 		@InjectModel('Member') private readonly memberModel: Model<Member>,
 		private authService: AuthService, // authService objectini hosl qildik
 		private viewService: ViewService,
+		private likeService: LikeService,
 	) {}
 
 	public async signup(input: MemberInput): Promise<Member> {
@@ -127,6 +131,27 @@ export class MemberService {
 		return result[0];
 	}
 
+	public async likeTargetMember(memberId: ObjectId, likeRefId: ObjectId): Promise<Member> {
+		const target: Member = await this.memberModel.findOne({ _id: likeRefId, memberStatus: MemberStatus.ACTIVE }).exec();
+		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		const input: LikeInput = {
+			memberId: memberId,
+			likeRefId: likeRefId,
+			likeGroup: LikeGroup.MEMBER, // memberlarga like
+		};
+		/** agar avval targetga like bosilgan bo'lsa toggle ishga tushib u likeni o'chirib natijani -1 qiladi 
+		 	agar birinchi marta like bosilayotgan bo'lsa +1 qilib databacedagi collectionga like logini qo'shib beradi
+		**/
+		// LIKE TOGGLE(almashtirish) via Like Module
+
+		const modifier: number = await this.likeService.toggleLike(input); //likeService
+		const result = await this.memberStatsEditor({ _id: likeRefId, targetKey: 'memberLikes', modifier: modifier }); // memberni static datasi yangilanadi
+
+		if(!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG)
+		return result
+	}
+
 	public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {
 		const { memberStatus, memberType, text } = input.search; // text search qilinsa
 		const match: T = {}; // hama turdagi userlar
@@ -160,7 +185,7 @@ export class MemberService {
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 		return result;
 	}
- // memberPropertiesni 1ga oshirib beradi
+	// memberPropertiesni 1ga oshirib beradi
 	public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
 		const { _id, targetKey, modifier } = input;
 		return await this.memberModel
