@@ -140,11 +140,7 @@ export class MemberService {
 			likeRefId: likeRefId,
 			likeGroup: LikeGroup.MEMBER, // memberlarga like
 		};
-		/** agar avval targetga like bosilgan bo'lsa toggle ishga tushib u likeni o'chirib natijani -1 qiladi 
-		 	agar birinchi marta like bosilayotgan bo'lsa +1 qilib databacedagi collectionga like logini qo'shib beradi
-		**/
-		// LIKE TOGGLE(almashtirish) via Like Module
-
+		
 		const modifier: number = await this.likeService.toggleLike(input); //likeService
 		const result = await this.memberStatsEditor({ _id: likeRefId, targetKey: 'memberLikes', modifier: modifier }); // memberni static datasi yangilanadi
 

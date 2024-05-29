@@ -10,6 +10,10 @@ import { Message } from '../../libs/enums/common.enum';
 export class LikeService {
 	constructor(@InjectModel('Like') private readonly likeModel: Model<Like>) {}
 
+    	/** TOGGLE(almashtirish)
+		 	agar avval targetga like bosilgan bo'lsa toggle ishga tushib u likeni o'chirib natijani -1 qiladi 
+		 	agar birinchi marta like bosilayotgan bo'lsa +1 qilib databacedagi collectionga like logini qo'shib beradi
+		**/
 	public async toggleLike(input: LikeInput): Promise<number> {
 		const search: T = { memberId: input.memberId, likeRefId: input.likeRefId },
 			exist = await this.likeModel.findOne(search).exec();

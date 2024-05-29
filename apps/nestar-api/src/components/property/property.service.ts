@@ -17,6 +17,9 @@ import { ViewService } from '../view/view.service';
 import { PropertyUpdate } from '../../libs/dto/property/property.update';
 import * as moment from 'moment';
 import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
+import { LikeService } from '../like/like.service';
+import { LikeInput } from '../../libs/dto/like/like.input';
+import { LikeGroup } from '../../libs/enums/like.enum';
 
 @Injectable()
 export class PropertyService {
@@ -24,6 +27,7 @@ export class PropertyService {
 		@InjectModel('Property') private readonly propertyModel: Model<Property>,
 		private memberService: MemberService,
 		private viewService: ViewService,
+		private likeService: LikeService,
 	) {}
 
 	public async createProperty(input: PropertyInput): Promise<Property> {
@@ -90,7 +94,8 @@ export class PropertyService {
 			.exec();
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-		if (soldAt || deletedAt) { // u yoki bu bo'lsa -1
+		if (soldAt || deletedAt) {
+			// u yoki bu bo'lsa -1
 			await this.memberService.memberStatsEditor({
 				_id: memberId,
 				targetKey: 'memberProperties',
@@ -114,7 +119,8 @@ export class PropertyService {
 				{ $sort: sort },
 				{
 					$facet: {
-						list: [ // list orqali chiqaradi
+						list: [
+							// list orqali chiqaradi
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
 							//meLiked
@@ -151,15 +157,16 @@ export class PropertyService {
 		if (typeList) match.propertyType = { $in: typeList };
 		// mongoDB Moongose
 		// $in => bo'lsa, operatori MongoDB da kolleksiyadagi hujjatlarni filtrlaydi
-		// $gte => dan yuqori 
+		// $gte => dan yuqori
 		// $lte => unga kichkina yoki teng
-		// $or => 
+		// $or =>
 		if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
 		if (squaresRange) match.propertySquare = { $gte: squaresRange.start, $lte: squaresRange.end };
 
 		if (text) match.propertyTitle = { $regex: new RegExp(text, 'i') }; // izlaganda bosh harfimi farqsz qidirsh
-		if (options) { // u yoki bu qiymatlaridan kamida bittasi true bo'lgan hujjatlarni qidir.
+		if (options) {
+			// u yoki bu qiymatlaridan kamida bittasi true bo'lgan hujjatlarni qidir.
 			match['$or'] = options.map((ele) => {
 				return { [ele]: true };
 			});
@@ -196,6 +203,25 @@ export class PropertyService {
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		return result[0];
+	}
+
+	public async likeTargetProperty(memberId: ObjectId, likeRefId: ObjectId): Promise<Property> {
+		const target: Property = await this.propertyModel
+			.findOne({ _id: likeRefId, propertyStatus: PropertyStatus.ACTIVE })
+			.exec();
+		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		const input: LikeInput = {
+			memberId: memberId,
+			likeRefId: likeRefId,
+			likeGroup: LikeGroup.PROPERTY, // propertylarga like
+		};
+
+		const modifier: number = await this.likeService.toggleLike(input); //likeServiceni toggleLike methodi
+		const result = await this.propertyStatsEditor({ _id: likeRefId, targetKey: 'propertyLikes', modifier: modifier }); // memberni static datasi yangilanadi
+
+		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+		return result;
 	}
 
 	public async getAllPropertiesByAdmin(input: AllPropertiesInquiry): Promise<Properties> {
