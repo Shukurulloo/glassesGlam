@@ -12,8 +12,8 @@ export const availablePropertySorts = [
 	'propertyRank',
 	'propertyPrice',
 ];
-export const availableBoardArticleSorts = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews']
-export const availableCommentSorts = ['createdAt', 'updatedAt']
+export const availableBoardArticleSorts = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews'];
+export const availableCommentSorts = ['createdAt', 'updatedAt'];
 
 /**  IMAGE CONFIGURATION **/
 import { v4 as uuidv4 } from 'uuid';
@@ -30,12 +30,30 @@ export const shapeIntoMongoObjectId = (target: any) => {
 	return typeof target === 'string' ? new ObjectId(target) : target; //shart: agar string bo'lsa ObjectIdga wrap qilsin aks holda  targetni o'zini qaytarsin
 };
 
-// authenticed bo'gan user bo'lsa uni 
+// authenticed bo'gan user bo'lsa uni
 export const lookupMember = {
 	$lookup: {
 		from: 'members', // qaysi collectiondan qayerdan izlash
 		localField: 'memberId',
 		foreignField: '_id', // _id bo'yicha
 		as: 'memberData', // nomini memberData qilib qaytar
+	},
+};
+
+export const lookupFollowingData = {
+	$lookup: {
+		from: 'members', // qaysi collectiondan qayerdan izlash
+		localField: 'followingId',
+		foreignField: '_id', // _id bo'yicha
+		as: 'followingData', // nomini
+	},
+};
+
+export const lookupFollowerData = {
+	$lookup: {
+		from: 'members', // qaysi collectiondan qayerdan izlash
+		localField: 'followerId',
+		foreignField: '_id', // _id bo'yicha
+		as: 'followerData',
 	},
 };

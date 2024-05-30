@@ -15,6 +15,6 @@ const FollowSchema = new Schema(
 	{ timestamps: true, collection: 'follows' },
 );
 
-FollowSchema.index({ followingId: 1, followerId: 1 }, { unique: true });
+FollowSchema.index({ followingId: 1, followerId: 1 }, { unique: true }); // faqat birmarta subscribe bola oladi degan uniq shart
 
 export default FollowSchema;

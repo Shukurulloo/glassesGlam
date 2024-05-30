@@ -16,7 +16,7 @@ export class MeFollowed {
 }
 
 @ObjectType()
-export class Follower {// bizga boshqa memberlar subscrube qilgan
+export class Follower {// bizga boshqa memberlar subscribe qilgan
 	@Field(() => String)
 	_id: ObjectId;
 
@@ -45,7 +45,7 @@ export class Follower {// bizga boshqa memberlar subscrube qilgan
 }
 
 @ObjectType()
-export class Following { // biz boshqa memberlarga (azoBolish)subscube qilganda
+export class Following { // biz boshqa memberlarga (azoBolish)subscribe qilganda
 	@Field(() => String)
 	_id: ObjectId;
 
