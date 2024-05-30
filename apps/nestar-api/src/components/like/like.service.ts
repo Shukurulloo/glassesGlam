@@ -8,7 +8,7 @@ import { Message } from '../../libs/enums/common.enum';
 
 @Injectable()
 export class LikeService {
-	constructor(@InjectModel('Like') private readonly likeModel: Model<Like>) {}
+	constructor(@InjectModel('Like') private readonly likeModel: Model<Like>) {} // likeschemamodulni injectqilamz
 
 	/** TOGGLE(almashtirish)
 		 	agar avval targetga like bosilgan bo'lsa toggle ishga tushib u likeni o'chirib natijani -1 qiladi 
@@ -33,14 +33,14 @@ export class LikeService {
 				throw new BadRequestException(Message.CREATE_FAILED);
 			}
 		}
-		console.log(`- Like modifier ${modifier} -`);
+		console.log(`- Like modifier ${modifier} -`); // -1 yoki +1  ni ko'rish uchun
 		return modifier;
 	}
 
 	public async checkLikeExistence(input: LikeInput): Promise<MeLiked[]> { // like bosilganlar
-        const {memberId, likeRefId} = input;
+        const {memberId, likeRefId} = input;// distractoin
         const result = await this.likeModel.findOne({memberId: memberId, likeRefId: likeRefId}).exec()
         // aggregation formatda tashkillaymiz
-		return result ?[{memberId: memberId, likeRefId: likeRefId, myFavorite: true}] : []; // agar resultni qiymati mavjud bo'lsa arrayni ichi bu qiymatlani qaytar. menol
+		return result ?[{memberId: memberId, likeRefId: likeRefId, myFavorite: true}] : []; // agar resultni qiymati mavjud bo'lsa arrayni ichi bu qiymatlani qaytar. menol: qo'lda qilish
 	}
 }
