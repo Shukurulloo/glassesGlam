@@ -31,10 +31,10 @@ export const shapeIntoMongoObjectId = (target: any) => {
 	return typeof target === 'string' ? new ObjectId(target) : target; //shart: agar string bo'lsa ObjectIdga wrap qilsin aks holda  targetni o'zini qaytarsin
 };
 
-// $_id => shuyerda hosl bo'gan propertilar ichidagi id ni qabul qilish un//  targetRefId kiritilmaganda shuyerga qo'yamz
+//complex query. $_id => shuyerda hosl bo'gan propertilar ichidagi id ni qabul qilish un//  targetRefId kiritilmaganda shuyerga qo'yamz
 export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = '$_id') => {
 	// targetRefId => propertilar Idsi
-	return {
+	return { 
 		$lookup: {
 			from: 'likes',
 			let: {
