@@ -18,6 +18,7 @@ export const availableCommentSorts = ['createdAt', 'updatedAt'];
 /**  IMAGE CONFIGURATION **/
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
+import { T } from './types/common';
 
 export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg']; // img formati
 export const getSerialForImage = (filename: string) => {
@@ -28,6 +29,43 @@ export const getSerialForImage = (filename: string) => {
 
 export const shapeIntoMongoObjectId = (target: any) => {
 	return typeof target === 'string' ? new ObjectId(target) : target; //shart: agar string bo'lsa ObjectIdga wrap qilsin aks holda  targetni o'zini qaytarsin
+};
+
+// $_id => shuyerda hosl bo'gan propertilar ichidagi id ni qabul qilish un//  targetRefId kiritilmaganda shuyerga qo'yamz
+export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = '$_id') => {
+	// targetRefId => propertilar Idsi
+	return {
+		$lookup: {
+			from: 'likes',
+			let: {
+				// search mehanizmini hosl qilish un variablelar
+				localLikeRefId: targetRefId, // "$_id"
+				localMemberId: memberId,
+				localMyFavorite: true,
+			},
+			pipeline: [
+				{
+					$match: {
+						// $expr => bir nechta narsani match qilish un.
+						$expr: {
+							// local variableni ishlatish un $$ kerak
+							$and: [{ $eq: ['$likeRefId', '$$localLikeRefId'] }, { $eq: ['$memberId', '$$localMemberId'] }], // aynan nimani solishtramz
+						}, // likeRefIdimz localLikeRefId ga teng bo'gan holatni topishni buyurdik
+					},
+				},
+				{
+					$project: {
+						_id: 0, // idni olib bermasin byDefault  hardoim 1 hisoblanadi
+						memberId: 1, // qolgan datasetlar  byDefault 0 bo'ladi shuning un 1 qilamz kerakli un
+						likeRefId: 1,
+						myFavorite: '$$localMyFavorite', // hammasi to'g'ri ishlasa local variableni qiymatini o'zini  joylaymz
+					},
+				},
+			],
+			// hosil qilingan pipeLine saqlash
+			as: 'meLiked', // shu nom bilan
+		},
+	};
 };
 
 // authenticed bo'gan user bo'lsa uni
@@ -51,9 +89,9 @@ export const lookupFollowingData = {
 
 export const lookupFollowerData = {
 	$lookup: {
-		from: 'members', // qaysi collectiondan qayerdan izlash
+		from: 'members',
 		localField: 'followerId',
-		foreignField: '_id', // _id bo'yicha
+		foreignField: '_id',
 		as: 'followerData',
 	},
 };

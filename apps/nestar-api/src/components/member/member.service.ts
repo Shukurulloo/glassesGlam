@@ -107,14 +107,13 @@ export class MemberService {
 		targetMember.meLiked = await this.likeService.checkLikeExistence(likeInput);
 
 		//mefollowed o'sha memberga subscripe qilingani
-		targetMember.meFollowed = await this.checkSubscription(memberId, targetId) // memberId bu followerId, targetId followingId
+		targetMember.meFollowed = await this.checkSubscription(memberId, targetId); // memberId bu followerId, targetId followingId
 		return targetMember;
 	}
 
 	private async checkSubscription(followerId: ObjectId, followingId: ObjectId): Promise<MeFollowed[]> {
-		const result = await this.followModel.findOne({followingId: followingId, followerId: followerId}).exec()
-		return result ? [{followingId: followingId, followerId: followerId, myFollowing: true}] : [];
-
+		const result = await this.followModel.findOne({ followingId: followingId, followerId: followerId }).exec();
+		return result ? [{ followingId: followingId, followerId: followerId, myFollowing: true }] : [];
 	}
 
 	public async getAgents(memberId: ObjectId, input: AgentsInquiry): Promise<Members> {
@@ -133,6 +132,7 @@ export class MemberService {
 					// facet bir nechta aggregate pipelarni bir vaqtni o'zida ishlatishga imkon beradi
 					$facet: {
 						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }], //pagination: talab etilgan agentlarni ro'yhatini olib beradi
+						//meLiked
 						metaCounter: [{ $count: 'total' }], // databacedagi umimiy memberlar sonini beradi
 					},
 				},
