@@ -34,7 +34,7 @@ export const shapeIntoMongoObjectId = (target: any) => {
 //complex query. $_id => shuyerda hosl bo'gan propertilar ichidagi id ni qabul qilish un//  targetRefId kiritilmaganda shuyerga qo'yamz
 export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = '$_id') => {
 	// targetRefId => propertilar Idsi
-	return { 
+	return {
 		$lookup: {
 			from: 'likes',
 			let: {
@@ -64,6 +64,46 @@ export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = '$_id')
 			],
 			// hosil qilingan pipeLine saqlash
 			as: 'meLiked', // shu nom bilan
+		},
+	};
+};
+
+interface LookupAuthMemberFollowed {
+	followerId: T;
+	followingId: string;
+}
+export const lookupAuthMemberFollowed = (input: LookupAuthMemberFollowed) => {
+	const {followerId, followingId} = input
+	return {
+		$lookup: {
+			from: 'follows',
+			let: {
+				// search mehanizmini hosl qilish un variablelar
+				localFollowerId: followerId, 
+				localFollowingId: followingId, // "$followingId"
+				localMyFavorite: true,
+			},
+			pipeline: [
+				{
+					$match: {
+						// $expr => bir nechta narsani match qilish un.
+						$expr: {
+							// local variableni ishlatish un $$ kerak
+							$and: [{ $eq: ['$followerId', '$$localFollowerId'] }, { $eq: ['$followingId', '$$localFollowingId'] }], // aynan nimani solishtramz
+						}, // likeRefIdimz localLikeRefId ga teng bo'gan holatni topishni buyurdik
+					},
+				},
+				{
+					$project: {
+						_id: 0, // idni olib bermasin byDefault  hardoim 1 hisoblanadi
+						followerId: 1, // qolgan datasetlar  byDefault 0 bo'ladi shuning un 1 qilamz kerakli un
+						followingId: 1,
+						myFollowing: '$$localMyFavorite', // hammasi to'g'ri ishlasa local variableni qiymatini o'zini  joylaymz
+					},
+				},
+			],
+			// hosil qilingan pipeLine saqlash
+			as: 'meFollowed', // shu nom bilan
 		},
 	};
 };
