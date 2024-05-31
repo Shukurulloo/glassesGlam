@@ -13,12 +13,14 @@ import { StatisticModifier, T } from '../../libs/types/common';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
+import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
 
 @Injectable() // asosiy mantiqlar
 export class MemberService {
 	// Memberni inject qili, memberModel schemani ulaymiz, Crud uchun
 	constructor(
 		@InjectModel('Member') private readonly memberModel: Model<Member>,
+		@InjectModel('Follow') private readonly followModel: Model<Follower | Following>,
 		private authService: AuthService, // authService objectini hosl qildik
 		private viewService: ViewService,
 		private likeService: LikeService,
@@ -100,12 +102,19 @@ export class MemberService {
 			}
 		}
 
-		// meLiked
+		// meLiked o'sha memberga like bosilgani tekshiriladi
 		const likeInput = { memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER };
 		targetMember.meLiked = await this.likeService.checkLikeExistence(likeInput);
 
-		//mefollowed
+		//mefollowed o'sha memberga subscripe qilingani
+		targetMember.meFollowed = await this.checkSubscription(memberId, targetId) // memberId bu followerId, targetId followingId
 		return targetMember;
+	}
+
+	private async checkSubscription(followerId: ObjectId, followingId: ObjectId): Promise<MeFollowed[]> {
+		const result = await this.followModel.findOne({followingId: followingId, followerId: followerId}).exec()
+		return result ? [{followingId: followingId, followerId: followerId, myFollowing: true}] : [];
+
 	}
 
 	public async getAgents(memberId: ObjectId, input: AgentsInquiry): Promise<Members> {
@@ -184,6 +193,7 @@ export class MemberService {
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 		return result;
 	}
+
 	// memberPropertiesni 1ga oshirib beradi
 	public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
 		const { _id, targetKey, modifier } = input;
