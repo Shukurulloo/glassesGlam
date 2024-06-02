@@ -17,7 +17,7 @@ export class BatchController {
 	/** Cron() => jobSchedule larni yasab beradi
 	 * 1-arg => cron time: qachon ishga tushushini begilaymiz
 	 * 2-arg => nomi */
-	@Cron('00 * * * * *', { name: BATCH_ROLLBACK }) // yarm tunda ishga tushsin
+	@Cron('00 00 01 * * *', { name: BATCH_ROLLBACK }) // yarm tunda soat 1da ishga tushsin va rankni 0ga tenglasin  sutkada 1marta
 	public async batchRollBack() {
 		// cron ishga tushgach ishlaydigon mantiq
 		try {
@@ -29,23 +29,23 @@ export class BatchController {
 		}
 	}
 
-	@Cron('20 * * * * *', { name: BATCH_TOP_PROPERTIES }) // yigirmanchi minutda ishga tushsin
-	public async batchProperties() {
+	@Cron('20 00 01 * * *', { name: BATCH_TOP_PROPERTIES }) //yarm tun soat 1 ni yigirmanchi minutida ishga tushsin
+	public async batchTopProperties() {
 		try {
 			this.logger['context'] = BATCH_TOP_PROPERTIES;
 			this.logger.debug('EXECUTED!');
-			await this.BatchService.batchProperties();
+			await this.BatchService.batchTopProperties();
 		} catch (err) {
 			this.logger.error(err);
 		}
 	}
 
-	@Cron('40 * * * * *', { name: BATCH_TOP_AGENTS })
-	public async batchAgents() {
+	@Cron('40 00 01 * * *', { name: BATCH_TOP_AGENTS }) // kunda bir bor 
+	public async batchTopAgents() {
 		try {
 			this.logger['context'] = BATCH_TOP_AGENTS;
 			this.logger.debug('EXECUTED!');
-			await this.BatchService.batchAgents();
+			await this.BatchService.batchTopAgents();
 		} catch (err) {
 			this.logger.error(err);
 		}
