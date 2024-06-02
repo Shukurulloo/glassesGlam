@@ -8,6 +8,7 @@ import { AppResolver } from './app.resolver';
 import { ComponentsModule } from './components/components.module';
 import { DatabaseModule } from './database/database.module';
 import { T } from './libs/types/common';
+import { SocketModule } from './socket/socket.module';
 
 /** AOP ni asosiy bo'lagi modul hisoblanadi
  Module decorator ichidagilar metadeta, metadeta esa hususiyati, detani tarifi, imkoniyatlar
@@ -37,6 +38,7 @@ import { T } from './libs/types/common';
 		}),
 		ComponentsModule, // faqat modullarni jamlab beradi
 		DatabaseModule,
+		SocketModule,
 	],
 	controllers: [AppController],
 	providers: [AppService, AppResolver], //providersdagi hamma narsalar Injectable bo'ladi

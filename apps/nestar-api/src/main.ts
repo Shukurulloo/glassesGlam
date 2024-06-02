@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { LoggingInterceptor } from './libs/interceptor/Logging.interceptor';
 import { graphqlUploadExpress } from 'graphql-upload'; // serverga yuklanayotgan datalarga limit qo'yish un kerak
 import * as express from 'express';
+import { WsAdapter } from '@nestjs/platform-ws';
 
 // nest js expressni yutib oladi
 async function bootstrap() {
@@ -15,6 +16,7 @@ async function bootstrap() {
 	app.use(graphqlUploadExpress({ maxFileSize: 15000000, maxFiles: 10 })); // 15mgb gacha, 10tagacha bo'sin
 	app.use('/uploads', express.static('./uploads')); // shu folderni tashqariga static folder qilb ochamz
 
+	app.useWebSocketAdapter(new WsAdapter(app)); // socket intergartsiya qilindi
 	await app.listen(process.env.PORT_API ?? 3000); // appModulda configni ulab bu mantiqni bajardik
 }
 bootstrap();
