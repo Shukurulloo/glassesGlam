@@ -44,7 +44,7 @@ export class FollowResolver {
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Followings> {
 		console.log('Query: getMemberFollowings');
-		const { followerId } = input.search; // faqat followerId qiymati talab qilinadi
+		const { followerId } = input.search; // faqat followerId qiymati talab qilinadi// biz followingini ko'rmoqchi bo'gan member
 		input.search.followerId = shapeIntoMongoObjectId(followerId);
 		return await this.followService.getMemberFollowings(memberId, input);
 	}
@@ -61,3 +61,7 @@ export class FollowResolver {
 		return await this.followService.getMemberFollowers(memberId, input);
 	}
 }
+
+// AUTH => DAVID
+// FOLLOWERID => MARTIN
+// FOLLOWING => SHAWN

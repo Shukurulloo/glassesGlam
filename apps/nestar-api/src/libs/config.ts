@@ -46,15 +46,17 @@ export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = '$_id')
 			pipeline: [
 				{
 					$match: {
+						// solishtramz
 						// $expr => bir nechta narsani match qilish un.
 						$expr: {
-							// local variableni ishlatish un $$ kerak
+							// local variableni ishlatish un $$ kerak. $ bu esa o'qish un
 							$and: [{ $eq: ['$likeRefId', '$$localLikeRefId'] }, { $eq: ['$memberId', '$$localMemberId'] }], // aynan nimani solishtramz
 						}, // likeRefIdimz localLikeRefId ga teng bo'gan holatni topishni buyurdik
 					},
 				},
 				{
 					$project: {
+						// project bu qurish hohlagan usulda
 						_id: 0, // idni olib bermasin byDefault  hardoim 1 hisoblanadi
 						memberId: 1, // qolgan datasetlar  byDefault 0 bo'ladi shuning un 1 qilamz kerakli un
 						likeRefId: 1,
@@ -73,13 +75,13 @@ interface LookupAuthMemberFollowed {
 	followingId: string;
 }
 export const lookupAuthMemberFollowed = (input: LookupAuthMemberFollowed) => {
-	const {followerId, followingId} = input
+	const { followerId, followingId } = input;
 	return {
 		$lookup: {
 			from: 'follows',
 			let: {
 				// search mehanizmini hosl qilish un variablelar
-				localFollowerId: followerId, 
+				localFollowerId: followerId,
 				localFollowingId: followingId, // "$followingId"
 				localMyFavorite: true,
 			},
@@ -133,5 +135,17 @@ export const lookupFollowerData = {
 		localField: 'followerId',
 		foreignField: '_id',
 		as: 'followerData',
+	},
+};
+
+/** yuqorida hosil bo'lgan natijani qiymatidan foydalanib 
+ 	 favoriteProperty ichdan memberId qabul qilinb members collectionidan izlab natijani
+ 	 favoriteProperty ni ichidagi memberData ga joylab beryapti */
+export const lookupFavorite = {
+	$lookup: {
+		from: 'members',
+		localField: 'favoriteProperty.memberId',
+		foreignField: '_id',
+		as: 'favoriteProperty.memberData',
 	},
 };

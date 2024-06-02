@@ -22,7 +22,7 @@ export class FollowService {
 
 	public async subscribe(followerId: ObjectId, followingId: ObjectId): Promise<Follower> {
 		// stringa o'tkazib qiymatlarni solishtramz, to'g'ridan-to'gri solishtrolmaymz chunki ularni qiymati bir xil bo'lsaham referencelari har xil bo'ladi
-		if (followerId.toString() === followingId.toString()) {
+		if (followerId.toString() === followingId.toString()) { // o'ziga o'zi follow bo'lolmaydigon mantiq
 			throw new InternalServerErrorException(Message.SELF_SUBSCRIPTION_DENIED);
 		}
 
@@ -66,6 +66,7 @@ export class FollowService {
 		return result;
 	}
 
+	// MEMBERID => DAVID
 	public async getMemberFollowings(memberId: ObjectId, input: FollowInquiry): Promise<Followings> {
 		const { page, limit, search } = input;
 		if (!search?.followerId) throw new InternalServerErrorException(Message.BAD_REQUEST); //followerId kirtilishi ithiyori bo'gani un agar kirtlmasa backend validationni ishlatamz
@@ -75,10 +76,10 @@ export class FollowService {
 
 		const result = await this.followModel
 			.aggregate([
-				{ $match: match },
+				{ $match: match }, // KO'RISH UCHUN LOG
 				{ $sort: { createdAt: Direction.DESC } }, // desending
 				{
-					// facet 2ta alohida pipeLinega ajratamz
+					// facet 2ta agrigationga bo'lamz uni alohida pipeLinelari bor,
 					$facet: {
 						list: [
 							{ $skip: (page - 1) * limit }, //pagination:
