@@ -155,10 +155,10 @@ export class PropertyService {
 			text,
 		} = input.search;
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId); // agar matchni ichida id bo'lsa shape qilamz
-		if (locationList) match.propertyLocation = { $in: locationList }; // agar matchni ichida propertyLocation
-		if (roomsList) match.propertyRooms = { $in: roomsList }; // agar roomsList bo'lsa matchga briktramz
-		if (bedsList) match.propertyBeds = { $in: bedsList };
-		if (typeList) match.propertyType = { $in: typeList };
+		if (locationList && locationList.length) match.propertyLocation = { $in: locationList }; // agar matchni ichida propertyLocation
+		if (roomsList && roomsList.length) match.propertyRooms = { $in: roomsList }; // agar roomsList bo'lsa matchga briktramz
+		if (bedsList && bedsList.length) match.propertyBeds = { $in: bedsList };
+		if (typeList && typeList.length) match.propertyType = { $in: typeList };
 		// mongoDB Moongose
 		// $in => bo'lsa, operatori MongoDB da kolleksiyadagi hujjatlarni filtrlaydi
 		// $gte => dan yuqori
