@@ -80,28 +80,29 @@ export class CommentService {
 		return result;
 	}
 
-    public async getComments(memberId: ObjectId, input: CommentsInquiry): Promise<Comments> {
+	public async getComments(memberId: ObjectId, input: CommentsInquiry): Promise<Comments> {
 		const { commentRefId } = input.search;
 		const match: T = { commentRefId: commentRefId, commentStatus: CommentStatus.ACTIVE };
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
-		const result: Comments[] = await this.commentModel.aggregate([
-			{ $match: match },
-			{ $sort: sort },
-			{
-				$facet: { //aggregation sistemni ikkiga bo'lyapmiz
-					list: [
-						{ $skip: (input.page - 1) * input.limit },
-						{ $limit: input.limit },
-
-						//meLiked
-						lookupMember,
-						{ $unwind: '$memberData' },
-					],
-					metaCounter: [{ $count: 'total' }],
+		const result: Comments[] = await this.commentModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },
+							// meLiked
+							lookupMember,
+							{ $unwind: '$memberData' },
+						],
+						metaCounter: [{ $count: 'total' }],
+					},
 				},
-			},
-		]);
+			])
+			.exec();
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		return result[0];

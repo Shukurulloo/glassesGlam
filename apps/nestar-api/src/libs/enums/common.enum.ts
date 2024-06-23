@@ -21,11 +21,19 @@ export enum Message {
 	SELF_SUBSCRIPTION_DENIED = 'Self subscription is denied',
 }
 
+
 export enum Direction {
-	ASC = 1, // yuqoridan pastga
-	DESC = -1, // pastdan yuqoriga
+	ASC = 1,
+	DESC = -1,
 }
 registerEnumType(Direction, {
-	// graohQL ga ro'yhatga olamz
 	name: 'Direction',
 });
+// export enum Direction {
+// 	ASC = 1, // yuqoridan pastga
+// 	DESC = -1, // pastdan yuqoriga
+// }
+// registerEnumType(Direction, {
+// 	// graohQL ga ro'yhatga olamz
+// 	name: 'Direction',
+// });

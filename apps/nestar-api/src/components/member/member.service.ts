@@ -121,6 +121,7 @@ export class MemberService {
 		const { text } = input.search; // text search qilinsa
 		const match: T = { memberType: MemberType.AGENT, memberStatus: MemberStatus.ACTIVE }; //active agentlarni ol
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC }; //kelayotgan inputni ichidan sortni qabul qilamz, yani bo'lsa o'zi bo'lmsa createdAt obtional
+
 		//dinamic usul: agar kelayotgan inputni ichida direction bo'lsa o'zi bo'lmasa Desc(yuqoridan pastga)
 		if (text) match.memberNick = { $regex: new RegExp(text, 'i') }; // flagini i qilib harfni katta kichik va harflar ketma-ketligi o'xshash bo'lsa ham farqsz qidirishini belgilaymiz
 		console.log('match:', match);
@@ -132,18 +133,15 @@ export class MemberService {
 				{
 					// facet bir nechta aggregate pipelarni bir vaqtni o'zida ishlatishga imkon beradi
 					$facet: {
-						list: [
-							{ $skip: (input.page - 1) * input.limit },
-							{ $limit: input.limit },
-							lookupAuthMemberLiked(memberId), // $_id
-						],
+						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit },lookupAuthMemberLiked(memberId)], // $_id
 						metaCounter: [{ $count: 'total' }], // databacedagi umimiy memberlar sonini beradi
 					},
 				},
 			])
 			.exec();
-		// console.log('result:', result);
+		console.log('result:', result);
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
 		return result[0];
 	}
 
