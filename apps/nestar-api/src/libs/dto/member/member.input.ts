@@ -70,7 +70,7 @@ export class AgentsInquiry {
 	sort?: string; // sorting
 
 	@IsOptional()
-	@Field(() => String, { nullable: true })
+	@Field(() => Direction, { nullable: true })
 	direction?: Direction; // yuqoridan pastga yoki aksi bo'gan filterlar uchun ishlatamz yani eng avval qo'shilgan yoki aksi
 
 	@IsNotEmpty()
