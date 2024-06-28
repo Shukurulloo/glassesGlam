@@ -57,7 +57,7 @@ export class FollowService {
 		const result = await this.followModel.findOneAndDelete({
 			followingId: followingId,
 			followerId: followerId,
-		});
+		}).exec();
 		if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		await this.memberService.memberStatsEditor({ _id: followerId, targetKey: 'memberFollowings', modifier: -1 }); // memberni static datasi yangilanadi
@@ -67,32 +67,33 @@ export class FollowService {
 	}
 
 	// MEMBERID => DAVID
+
 	public async getMemberFollowings(memberId: ObjectId, input: FollowInquiry): Promise<Followings> {
 		const { page, limit, search } = input;
-		if (!search?.followerId) throw new InternalServerErrorException(Message.BAD_REQUEST); //followerId kirtilishi ithiyori bo'gani un agar kirtlmasa backend validationni ishlatamz
-
+		if (!search?.followerId) throw new InternalServerErrorException(Message.BAD_REQUEST);
 		const match: T = { followerId: search?.followerId };
 		console.log('match:', match);
 
 		const result = await this.followModel
 			.aggregate([
-				{ $match: match }, // KO'RISH UCHUN LOG
-				{ $sort: { createdAt: Direction.DESC } }, // desending
+				{ $match: match },
+				{ $sort: { createdAt: Direction.DESC } },
 				{
-					// facet 2ta agrigationga bo'lamz uni alohida pipeLinelari bor,
 					$facet: {
 						list: [
-							{ $skip: (page - 1) * limit }, //pagination:
+							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
-							lookupAuthMemberLiked(memberId, '$followingId'), //  "$followingId" shu followingga like bosilganmi bilish un uni idsi
-							lookupAuthMemberFollowed({ 
-								followerId: memberId, 
-								followingId: '$followingId' }),
-							lookupFollowingData, // meFollowed
+							// meLiked
+							lookupAuthMemberLiked(memberId, '$followingId'),
+							// meFollowed
+							lookupAuthMemberFollowed({
+								followerId: memberId, //David
+								followingId: '$followingId', // Shawn
+							}),
+							lookupFollowingData, // biz follow bo`lgan memberni to`liq malumotini olib beradi
 							{ $unwind: '$followingData' },
 						],
-
-						metaCounter: [{ $count: 'total' }], // databacedagi umimiy follow sonini beradi
+						metaCounter: [{ $count: 'total' }],
 					},
 				},
 			])
@@ -101,6 +102,40 @@ export class FollowService {
 
 		return result[0];
 	}
+	// public async getMemberFollowings(memberId: ObjectId, input: FollowInquiry): Promise<Followings> {
+	// 	const { page, limit, search } = input;
+	// 	if (!search?.followerId) throw new InternalServerErrorException(Message.BAD_REQUEST); //followerId kirtilishi ithiyori bo'gani un agar kirtlmasa backend validationni ishlatamz
+
+	// 	const match: T = { followerId: search?.followerId };
+	// 	console.log('match:', match);
+
+	// 	const result = await this.followModel
+	// 		.aggregate([
+	// 			{ $match: match }, // KO'RISH UCHUN LOG
+	// 			{ $sort: { createdAt: Direction.DESC } }, // desending
+	// 			{
+	// 				// facet 2ta agrigationga bo'lamz uni alohida pipeLinelari bor,
+	// 				$facet: {
+	// 					list: [
+	// 						{ $skip: (page - 1) * limit }, //pagination:
+	// 						{ $limit: limit },
+	// 						lookupAuthMemberLiked(memberId, '$followingId'), //  "$followingId" shu followingga like bosilganmi bilish un uni idsi
+	// 						lookupAuthMemberFollowed({ 
+	// 							followerId: memberId, 
+	// 							followingId: '$followingId' }),
+	// 						lookupFollowingData, // meFollowed
+	// 						{ $unwind: '$followingData' },
+	// 					],
+
+	// 					metaCounter: [{ $count: 'total' }], // databacedagi umimiy follow sonini beradi
+	// 				},
+	// 			},
+	// 		])
+	// 		.exec();
+	// 	if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+	// 	return result[0];
+	// }
 
 	public async getMemberFollowers(memberId: ObjectId, input: FollowInquiry): Promise<Followers> {
 		const { page, limit, search } = input;

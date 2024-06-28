@@ -16,7 +16,7 @@ export class MeFollowed {
 }
 
 @ObjectType()
-export class Follower {// bizga boshqa memberlar subscribe qilgan
+export class Follower {
 	@Field(() => String)
 	_id: ObjectId;
 
@@ -45,7 +45,7 @@ export class Follower {// bizga boshqa memberlar subscribe qilgan
 }
 
 @ObjectType()
-export class Following { // biz boshqa memberlarga (azoBolish)subscribe qilganda
+export class Following {
 	@Field(() => String)
 	_id: ObjectId;
 
@@ -74,7 +74,7 @@ export class Following { // biz boshqa memberlarga (azoBolish)subscribe qilganda
 }
 
 @ObjectType()
-export class Followings { // memberga dahldor jami followingslarni sonini, listini qaytaramz, biz azo bo'lganlar
+export class Followings {
 	@Field(() => [Following])
 	list: Following[];
 
@@ -83,7 +83,7 @@ export class Followings { // memberga dahldor jami followingslarni sonini, listi
 }
 
 @ObjectType()
-export class Followers { // bizga azo bo'lgan memberlar
+export class Followers {
 	@Field(() => [Follower])
 	list: Follower[];
 

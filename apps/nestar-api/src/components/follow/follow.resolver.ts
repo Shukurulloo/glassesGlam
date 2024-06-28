@@ -36,18 +36,29 @@ export class FollowResolver {
 
 		return await this.followService.unsubscribe(memberId, followingId);
 	}
-
-	@UseGuards(WithoutGuard) // authorisation
+	@UseGuards(WithoutGuard)
 	@Query((returns) => Followings)
-	public async getMemberFollowings(  // biz subscribe bo'lganlar
+	public async getMemberFollowings(
 		@Args('input') input: FollowInquiry,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Followings> {
 		console.log('Query: getMemberFollowings');
-		const { followerId } = input.search; // faqat followerId qiymati talab qilinadi// biz followingini ko'rmoqchi bo'gan member
+		const { followerId } = input.search;
 		input.search.followerId = shapeIntoMongoObjectId(followerId);
-		return await this.followService.getMemberFollowings(memberId, input);
+		return await this.followService.getMemberFollowings(memberId, input); // notAuthMemb => memberId "null"
 	}
+
+	// @UseGuards(WithoutGuard) // authorisation
+	// @Query((returns) => Followings)
+	// public async getMemberFollowings(  // biz subscribe bo'lganlar
+	// 	@Args('input') input: FollowInquiry,
+	// 	@AuthMember('_id') memberId: ObjectId,
+	// ): Promise<Followings> {
+	// 	console.log('Query: getMemberFollowings');
+	// 	const { followerId } = input.search; // faqat followerId qiymati talab qilinadi// biz followingini ko'rmoqchi bo'gan member
+	// 	input.search.followerId = shapeIntoMongoObjectId(followerId);
+	// 	return await this.followService.getMemberFollowings(memberId, input);
+	// }
 
     @UseGuards(WithoutGuard) // authorisation
 	@Query((returns) => Followers)
