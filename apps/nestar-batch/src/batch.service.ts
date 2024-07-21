@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Member } from 'apps/nestar-api/src/libs/dto/member/member';
-import { Property } from 'apps/nestar-api/src/libs/dto/property/property';
-import { MemberStatus, MemberType } from 'apps/nestar-api/src/libs/enums/member.enum';
-import { PropertyStatus } from 'apps/nestar-api/src/libs/enums/property.enum';
+import { Member } from 'apps/glassesGlam-api/src/libs/dto/member/member';
+import { Property } from 'apps/glassesGlam-api/src/libs/dto/property/property';
+import { MemberStatus, MemberType } from 'apps/glassesGlam-api/src/libs/enums/member.enum';
+import { PropertyStatus } from 'apps/glassesGlam-api/src/libs/enums/property.enum';
 import { Model } from 'mongoose';
 
 @Injectable()
@@ -51,7 +51,7 @@ export class BatchService {
 			const rank = propertyLikes * 2 + propertyViews * 1; // qonuniyat orqali ranklarni hisoblab qo'lga olamz
 			return await this.propertyModel.findByIdAndUpdate(_id, { propertyRank: rank }); //o'sha propertyga dahldor bo'gan rankini o'zgartiramz
 		});
-		await Promise.all(promisedList); //promisedList: pending object. ularni hammasini Promise.all orqali amalga oshiramz 
+		await Promise.all(promisedList); //promisedList: pending object. ularni hammasini Promise.all orqali amalga oshiramz
 	}
 
 	public async batchTopAgents(): Promise<void> {
@@ -74,6 +74,6 @@ export class BatchService {
 	}
 
 	public getHello(): string {
-		return 'Welcome to Nestar BATCH Server!';
+		return 'Welcome to glassesGlam BATCH Server!';
 	}
 }

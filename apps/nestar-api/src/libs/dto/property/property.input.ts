@@ -1,7 +1,7 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsInt, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import { MemberAuthType, MemberStatus, MemberType } from '../../enums/member.enum';
-import { PropertyLocation, PropertyStatus, PropertyType } from '../../enums/property.enum';
+import { PropertyColor, PropertyGlass, PropertySize, PropertyStatus, PropertyType } from '../../enums/property.enum';
 import { ObjectId } from 'mongoose';
 import { availableAgentSorts, availableOptions, availablePropertySorts } from '../../config';
 import { Direction } from '../../enums/common.enum';
@@ -14,8 +14,20 @@ export class PropertyInput {
 	propertyType: PropertyType;
 
 	@IsNotEmpty()
-	@Field(() => PropertyLocation)
-	propertyLocation: PropertyLocation;
+	@Field(() => PropertyStatus)
+	propertyStatus: PropertyStatus;
+
+	@IsNotEmpty()
+	@Field(() => PropertyGlass)
+	propertyGlass: PropertyGlass;
+
+	@IsNotEmpty()
+	@Field(() => PropertySize)
+	propertySize: PropertySize;
+
+	@IsNotEmpty()
+	@Field(() => PropertyColor)
+	propertyColor: PropertyColor;
 
 	@IsNotEmpty()
 	@Length(3, 100)
@@ -32,22 +44,6 @@ export class PropertyInput {
 	propertyPrice: number;
 
 	@IsNotEmpty()
-	@Field(() => Number)
-	propertySquare: number; // Square
-
-	@IsNotEmpty()
-	@IsInt()
-	@Min(1)
-	@Field(() => Int)
-	propertyBeds: number;
-
-	@IsNotEmpty()
-	@IsInt()
-	@Min(1)
-	@Field(() => Int)
-	propertyRooms: number;
-
-	@IsNotEmpty()
 	@Field(() => [String])
 	propertyImages: string[];
 
@@ -56,20 +52,8 @@ export class PropertyInput {
 	@Field(() => String, { nullable: true })
 	propertyDesc?: string;
 
-	@IsOptional()
-	@Field(() => Boolean, { nullable: true })
-	propertyBarter?: boolean;
-
-	@IsOptional()
-	@Field(() => Boolean, { nullable: true })
-	propertyRent?: boolean;
-
 	// type lar cresh bo'lmasligi un faqat typescript un
 	memberId?: ObjectId; //qiymatini request qilayotgan memberni authen bosqichdan qabul qilamz, frontenddan emas
-
-	@IsOptional()
-	@Field(() => Date, { nullable: true })
-	constructedAt?: Date;
 }
 
 @InputType()
@@ -105,21 +89,19 @@ export class PISearch {
 	@Field(() => String, { nullable: true })
 	memberId?: ObjectId;
 
-	@IsOptional()
-	@Field(() => [PropertyLocation], { nullable: true })
-	locationList?: PropertyLocation[];
-
-	@IsOptional()
 	@Field(() => [PropertyType], { nullable: true })
 	typeList?: PropertyType[];
 
 	@IsOptional()
-	@Field(() => [Int], { nullable: true })
-	roomsList?: Number[];
+	@Field(() => [PropertyGlass], { nullable: true })
+	glassList?: PropertyGlass[];
 
 	@IsOptional()
-	@Field(() => [Int], { nullable: true })
-	bedsList?: Number[];
+	@Field(() => [PropertySize], { nullable: true })
+	sizeList?: PropertySize[];
+
+	@Field(() => [PropertyColor], { nullable: true })
+	colorList?: PropertyColor[];
 
 	@IsOptional()
 	@IsIn(availableOptions, { each: true })
@@ -133,10 +115,6 @@ export class PISearch {
 	@IsOptional()
 	@Field(() => PeriodsRange, { nullable: true })
 	periodsRange?: PeriodsRange;
-
-	@IsOptional()
-	@Field(() => SquaresRange, { nullable: true })
-	squaresRange?: SquaresRange;
 
 	@IsOptional()
 	@Field(() => String, { nullable: true })
@@ -209,8 +187,20 @@ class ALPISearch {
 	propertyStatus?: PropertyStatus;
 
 	@IsOptional()
-	@Field(() => [PropertyLocation], { nullable: true })
-	propertyLocationList?: PropertyLocation[];
+	@Field(() => [PropertyType], { nullable: true })
+	typeList?: PropertyType[];
+
+	@IsOptional()
+	@Field(() => [PropertyGlass], { nullable: true })
+	glassList?: PropertyGlass[];
+
+	@IsOptional()
+	@Field(() => [PropertySize], { nullable: true })
+	sizeList?: PropertySize[];
+
+	@IsOptional()
+	@Field(() => [PropertyColor], { nullable: true })
+	colorList?: PropertyColor[];
 }
 
 @InputType()
@@ -238,7 +228,6 @@ export class AllPropertiesInquiry {
 	@Field(() => ALPISearch)
 	search: ALPISearch;
 }
-
 
 @InputType()
 export class OrdinaryInquiry {

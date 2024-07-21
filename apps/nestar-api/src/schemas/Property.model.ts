@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { PropertyLocation, PropertyStatus, PropertyType } from '../libs/enums/property.enum';
+import { PropertyColor, PropertyGlass, PropertySize, PropertyStatus, PropertyType } from '../libs/enums/property.enum';
 
 const PropertySchema = new Schema(
 	{
@@ -15,9 +15,21 @@ const PropertySchema = new Schema(
 			default: PropertyStatus.ACTIVE,
 		},
 
-		propertyLocation: {
+		propertyGlass: {
 			type: String,
-			enum: PropertyLocation,
+			enum: PropertyGlass,
+			required: true,
+		},
+
+		propertySize: {
+			type: String,
+			enum: PropertySize,
+			required: true,
+		},
+
+		propertyColor: {
+			type: String,
+			enum: PropertyColor,
 			required: true,
 		},
 
@@ -32,21 +44,6 @@ const PropertySchema = new Schema(
 		},
 
 		propertyPrice: {
-			type: Number,
-			required: true,
-		},
-
-		propertySquare: {
-			type: Number,
-			required: true,
-		},
-
-		propertyBeds: {
-			type: Number,
-			required: true,
-		},
-
-		propertyRooms: {
 			type: Number,
 			required: true,
 		},
@@ -80,16 +77,6 @@ const PropertySchema = new Schema(
 			type: String,
 		},
 
-		propertyBarter: {
-			type: Boolean,
-			default: false,
-		},
-
-		propertyRent: {
-			type: Boolean,
-			default: false,
-		},
-
 		memberId: {
 			type: Schema.Types.ObjectId,
 			required: true,
@@ -104,13 +91,10 @@ const PropertySchema = new Schema(
 			type: Date,
 		},
 
-		constructedAt: {
-			type: Date,
-		},
 	},
 	{ timestamps: true, collection: 'properties' },
 );
 // compount index, yani 4ta malumot bir vaqtda unit bo'lishi kerak takror kiritilishini oldini olish
-PropertySchema.index({ propertyType: 1, propertyLocation: 1, propertyTitle: 1, propertyPrice: 1 }, { unique: true });
+PropertySchema.index({ propertyType: 1, propertyGlass: 1, propertyTitle: 1, propertyPrice: 1, propertyColor: 1, }, { unique: true });
 
 export default PropertySchema;

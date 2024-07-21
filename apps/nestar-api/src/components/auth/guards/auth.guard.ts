@@ -1,9 +1,10 @@
 import { BadRequestException, CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
-import { Message } from 'apps/nestar-api/src/libs/enums/common.enum';
+import { Message } from 'apps/glassesGlam-api/src/libs/enums/common.enum';
 // (middleware?)
 @Injectable()
-export class AuthGuard implements CanActivate { // classga  interface implements bo'ladi
+export class AuthGuard implements CanActivate {
+	// classga  interface implements bo'ladi
 	constructor(private authService: AuthService) {}
 
 	// kirib kelayotgan requestni contexsini qo'lga olib beradigon mantiq , yani tekshrib beradi

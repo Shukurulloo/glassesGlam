@@ -1,9 +1,10 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export enum PropertyType {
-	APARTMENT = 'APARTMENT',
-	VILLA = 'VILLA',
-	HOUSE = 'HOUSE',
+	MEN = 'MEN',
+	WOMEN = 'WOMEN',
+	UNISEX = 'UNISEX',
+	KIDS = 'KIDS',
 }
 registerEnumType(PropertyType, {
 	name: 'PropertyType',
@@ -18,17 +19,40 @@ registerEnumType(PropertyStatus, {
 	name: 'PropertyStatus',
 });
 
-export enum PropertyLocation {
-	SEOUL = 'SEOUL',
-	BUSAN = 'BUSAN',
-	INCHEON = 'INCHEON',
-	DAEGU = 'DAEGU',
-	GYEONGJU = 'GYEONGJU',
-	GWANGJU = 'GWANGJU',
-	CHONJU = 'CHONJU',
-	DAEJON = 'DAEJON',
-	JEJU = 'JEJU',
+export enum PropertyGlass {
+	SUN_GLASSES = 'SUNGLASSES',
+	READING_GLASSES = 'READING_GLASSES',
+	POLARIZED_GLASSES = 'POLARIZED_GLASSES',
+	SPORTS_GLASSES = 'SPORTS_GLASSES',
+	FASHION_GLASSES = 'FASHION_GLASSES',
 }
-registerEnumType(PropertyLocation, {
-	name: 'PropertyLocation',
+registerEnumType(PropertyGlass, {
+	name: 'PropertyGlass',
 });
+
+export enum PropertySize {
+	SMALL = 'SMALL',
+	MEDIUM = 'MEDIUM',
+	LARGE = 'LARGE',
+	EXTRA_LARGE = 'EXTRA_LARGE',
+}
+registerEnumType(PropertySize, {
+	name: 'PropertySize',
+});
+
+export enum PropertyColor {
+	BLACK = 'BLACK',
+	WHITE = 'WHITE',
+	BROWN = 'BROWN',
+	BLUE = 'BLUE',
+	RED = 'RED',
+	GREEN = 'GREEN',
+	YELLOW = 'YELLOW',
+	GRAY = 'GRAY',
+	SILVER = 'SILVER',
+	GOLD = 'GOLD',
+}
+registerEnumType(PropertyColor, {
+	name: 'PropertyColor',
+});
+

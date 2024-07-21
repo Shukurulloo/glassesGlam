@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
 import { MemberAuthType, MemberStatus, MemberType } from '../../enums/member.enum';
-import { PropertyLocation, PropertyStatus, PropertyType } from '../../enums/property.enum';
+import { PropertyColor, PropertyGlass, PropertySize, PropertyStatus, PropertyType } from '../../enums/property.enum';
 import { Member, TotalCounter } from '../member/member';
 import { MeLiked } from '../like/like';
 // bu fayl backentdan clientga to'g'ri data chiqishi dto si
@@ -15,10 +15,16 @@ export class Property {
 	propertyType: PropertyType;
 
 	@Field(() => PropertyStatus)
-	propertyStatus: PropertyType;
+	propertyStatus: PropertyStatus;
 
-	@Field(() => PropertyLocation)
-	propertyLocation: PropertyLocation;
+	@Field(() => PropertyGlass)
+	propertyGlass: PropertyGlass;
+
+	@Field(() => PropertySize)
+	propertySize: PropertySize;
+
+	@Field(() => PropertyColor)
+	propertyColor: PropertyColor;
 
 	@Field(() => String)
 	propertyAddress: string;
@@ -28,15 +34,6 @@ export class Property {
 
 	@Field(() => Number)
 	propertyPrice: number;
-
-	@Field(() => Number)
-	propertySquare: number;
-
-	@Field(() => Int)
-	propertyBeds: number;
-
-	@Field(() => Int)
-	propertyRooms: number;
 
 	@Field(() => Int)
 	propertyViews: number;
@@ -56,12 +53,6 @@ export class Property {
 	@Field(() => String, { nullable: true })
 	propertyDesc?: string;
 
-	@Field(() => Boolean)
-	propertyBarter: boolean;
-
-	@Field(() => Boolean)
-	propertyRent: boolean;
-
 	@Field(() => String)
 	memberId: ObjectId;
 
@@ -70,9 +61,6 @@ export class Property {
 
 	@Field(() => Date, { nullable: true })
 	deletedAt?: Date;
-
-	@Field(() => Date, { nullable: true })
-	constructedAt?: Date;
 
 	// field => bu graphql uchun type registratsiyasi
 	@Field(() => Date)
@@ -88,7 +76,6 @@ export class Property {
 
 	@Field(() => Member, { nullable: true })
 	memberData?: Member;
-
 }
 
 @ObjectType()

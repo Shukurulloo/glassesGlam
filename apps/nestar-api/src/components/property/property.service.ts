@@ -127,7 +127,7 @@ export class PropertyService {
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
 							//meLiked
-							lookupAuthMemberLiked(memberId), 
+							lookupAuthMemberLiked(memberId),
 							lookupMember, // qidirsh
 							{ $unwind: '$memberData' }, // memberDatani [] arraydan chiqarib olamz chunki (1ta)single dok bo'lgani uchun
 						],
@@ -141,33 +141,15 @@ export class PropertyService {
 	}
 
 	private shapeMatchQuery(match: T, input: PropertiesInquiry): void {
-		const {
-			//bo'lishi shart
-			memberId,
-			locationList,
-			roomsList,
-			bedsList,
-			typeList,
-			periodsRange,
-			pricesRange,
-			squaresRange,
-			options,
-			text,
-		} = input.search;
+		const { memberId, typeList, glassList, sizeList, colorList, periodsRange, pricesRange, options, text } =
+			input.search;
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId); // agar matchni ichida id bo'lsa shape qilamz
-		if (locationList && locationList.length) match.propertyLocation = { $in: locationList }; // agar matchni ichida propertyLocation
-		if (roomsList && roomsList.length) match.propertyRooms = { $in: roomsList }; // agar roomsList bo'lsa matchga briktramz
-		if (bedsList && bedsList.length) match.propertyBeds = { $in: bedsList };
-		if (typeList && typeList.length) match.propertyType = { $in: typeList };
-		// mongoDB Moongose
-		// $in => bo'lsa, operatori MongoDB da kolleksiyadagi hujjatlarni filtrlaydi
-		// $gte => dan yuqori
-		// $lte => unga kichkina yoki teng
-		// $or =>
-		if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
+		if (typeList && typeList.length) match.propertyType = { $in: typeList }; // agar matchni ichida propertyLocation
+		if (glassList && glassList.length) match.propertyGlass = { $in: glassList }; // agar roomsList bo'lsa matchga briktramz
+		if (sizeList && sizeList.length) match.propertySize = { $in: sizeList };
+		if (colorList && colorList.length) match.propertyColor = { $in: colorList };
 		if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
-		if (squaresRange) match.propertySquare = { $gte: squaresRange.start, $lte: squaresRange.end };
-
+		if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (text) match.propertyTitle = { $regex: new RegExp(text, 'i') }; // izlaganda bosh harfimi farqsz qidirsh
 		if (options) {
 			// u yoki bu qiymatlaridan kamida bittasi true bo'lgan hujjatlarni qidir.
@@ -178,11 +160,11 @@ export class PropertyService {
 	}
 
 	public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
-		return await this.likeService.getFavoriteProperties(memberId, input)
+		return await this.likeService.getFavoriteProperties(memberId, input);
 	}
 
 	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
-		return await this.viewService.getVisitedProperties(memberId, input)
+		return await this.viewService.getVisitedProperties(memberId, input);
 	}
 
 	public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInquiry): Promise<Properties> {
@@ -237,13 +219,15 @@ export class PropertyService {
 	}
 
 	public async getAllPropertiesByAdmin(input: AllPropertiesInquiry): Promise<Properties> {
-		const { propertyStatus, propertyLocationList } = input.search; // text search qilinsa
-		const match: T = {}; // hama turdagi
+		const { propertyStatus, typeList,glassList,sizeList,colorList } = input.search; // text search qilinsa
+		const match: T = {}; 
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC }; //kelayotgan inputni ichidan sortni qabul qilamz, yani bo'lsa o'zi bo'lmsa createdAt obtional
 
 		if (propertyStatus) match.propertyStatus = propertyStatus;
-		if (propertyLocationList) match.propertyLocation = { $in: propertyLocationList };
-
+		if (typeList) match.propertyType = { $in: typeList };
+		if (glassList) match.propertyGlass = { $in: glassList };
+		if (sizeList) match.propertySize = { $in: sizeList };
+		if (colorList) match.propertyColor = { $in: colorList };
 		const result = await this.propertyModel
 			.aggregate([
 				{ $match: match },
