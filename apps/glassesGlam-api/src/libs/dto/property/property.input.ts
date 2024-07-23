@@ -14,10 +14,6 @@ export class PropertyInput {
 	propertyType: PropertyType;
 
 	@IsNotEmpty()
-	@Field(() => PropertyStatus)
-	propertyStatus: PropertyStatus;
-
-	@IsNotEmpty()
 	@Field(() => PropertyGlass)
 	propertyGlass: PropertyGlass;
 

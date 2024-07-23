@@ -69,7 +69,7 @@ export class MemberResolver {
 		@Args('memberId') input: string,
 		@AuthMember('_id') memberId: ObjectId, //
 	): Promise<Member> {
-		console.log('Query: getMember');
+		console.log('Query: getMember'); 
 		// console.log('memberId:', memberId);
 		const targetid = shapeIntoMongoObjectId(input);
 		return await this.memberService.getMember(memberId, targetid);

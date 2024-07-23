@@ -3,8 +3,8 @@ import { registerEnumType } from '@nestjs/graphql';
 export enum PropertyType {
 	MEN = 'MEN',
 	WOMEN = 'WOMEN',
-	UNISEX = 'UNISEX',
 	KIDS = 'KIDS',
+	UNISEX = 'UNISEX',
 }
 registerEnumType(PropertyType, {
 	name: 'PropertyType',
@@ -34,7 +34,7 @@ export enum PropertySize {
 	SMALL = 'SMALL',
 	MEDIUM = 'MEDIUM',
 	LARGE = 'LARGE',
-	EXTRA_LARGE = 'EXTRA_LARGE',
+	// EXTRA_LARGE = 'EXTRA_LARGE',
 }
 registerEnumType(PropertySize, {
 	name: 'PropertySize',
@@ -43,12 +43,11 @@ registerEnumType(PropertySize, {
 export enum PropertyColor {
 	BLACK = 'BLACK',
 	WHITE = 'WHITE',
-	BROWN = 'BROWN',
+	BROWN = 'BROWN', //JIGARRANG
 	BLUE = 'BLUE',
 	RED = 'RED',
 	GREEN = 'GREEN',
 	YELLOW = 'YELLOW',
-	GRAY = 'GRAY',
 	SILVER = 'SILVER',
 	GOLD = 'GOLD',
 }
