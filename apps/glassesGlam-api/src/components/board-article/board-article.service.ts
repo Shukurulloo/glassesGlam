@@ -18,14 +18,20 @@ import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../
 import { LikeService } from '../like/like.service';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
+import { Member } from '../../libs/dto/member/member';
+import { NotificationService } from '../notification/notification.service';
+import { MemberStatus } from '../../libs/enums/member.enum';
+import { NotificationGroup, NotificationStatus, NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class BoardArticleService {
 	constructor(
 		@InjectModel('BoardArticle') private readonly boardArticleModel: Model<BoardArticle>,
+		@InjectModel('Member') private readonly memberModel: Model<Member>,
 		private readonly memberService: MemberService,
 		private readonly viewService: ViewService,
-		private likeService: LikeService,
+		private readonly likeService: LikeService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	public async createBoardArticle(memberId: ObjectId, input: BoardArticleInput): Promise<BoardArticle> {
@@ -141,6 +147,11 @@ export class BoardArticleService {
 			.findOne({ _id: likeRefId, articleStatus: BoardArticleStatus.ACTIVE })
 			.exec();
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		const authMember: Member = await this.memberModel
+		.findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
+		.exec();
+
+	if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const input: LikeInput = {
 			memberId: memberId,
@@ -155,6 +166,18 @@ export class BoardArticleService {
 			modifier: modifier,
 		}); // memberni static datasi yangilanadi
 
+		const notificInput= {
+			notificationType: NotificationType.LIKE,
+			notificationStatus: NotificationStatus.WAIT,
+			notificationGroup: NotificationGroup.ARTICLE,
+			notificationTitle: 'New Like',
+			notificationDesc: `${authMember.memberNick} Liked article ${target.articleTitle}`,
+			authorId: memberId,
+			receiverId: target.memberId,
+			articleId: likeRefId,
+		};
+
+		await this.notificationService.createNotification(notificInput);
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
 		return result;
 	}

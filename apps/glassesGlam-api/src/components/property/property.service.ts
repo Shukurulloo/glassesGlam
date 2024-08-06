@@ -21,14 +21,20 @@ import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../
 import { LikeService } from '../like/like.service';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
+import { Member } from '../../libs/dto/member/member';
+import { NotificationService } from '../notification/notification.service';
+import { MemberStatus } from '../../libs/enums/member.enum';
+import { NotificationGroup, NotificationStatus, NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class PropertyService {
 	constructor(
 		@InjectModel('Property') private readonly propertyModel: Model<Property>,
+		@InjectModel('Member') private memberModel: Model<Member>,
 		private memberService: MemberService,
 		private viewService: ViewService,
 		private likeService: LikeService,
+		private notificationService: NotificationService,
 	) {}
 
 	public async createProperty(input: PropertyInput): Promise<Property> {
@@ -205,6 +211,12 @@ export class PropertyService {
 			.exec();
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
+
+		const AuthMember: Member = await this.memberModel
+			.findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
+			.exec();
+		if (!AuthMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
 		const input: LikeInput = {
 			memberId: memberId,
 			likeRefId: likeRefId,
@@ -213,6 +225,18 @@ export class PropertyService {
 
 		const modifier: number = await this.likeService.toggleLike(input); //likeServiceni toggleLike methodi
 		const result = await this.propertyStatsEditor({ _id: likeRefId, targetKey: 'propertyLikes', modifier: modifier }); // memberni static datasi yangilanadi
+
+		const NotificInput = {
+			notificationType: NotificationType.LIKE,
+			notificationStatus: NotificationStatus.WAIT,
+			notificationGroup: NotificationGroup.PROPERTY,
+			notificationTitle: 'Like',
+			notificationDesc: `${AuthMember.memberNick} Liked Vehicle `,
+			authorId: memberId,
+			receiverId: target.memberId,
+		};
+
+		await this.notificationService.createNotification(NotificInput);
 
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
 		return result;

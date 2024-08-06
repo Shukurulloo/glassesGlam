@@ -7,6 +7,9 @@ import { LikeModule } from './like/like.module';
 import { ViewModule } from './view/view.module';
 import { FollowModule } from './follow/follow.module';
 import { BoardArticleModule } from './board-article/board-article.module';
+import { FaqModule } from './faq/faq.module';
+import { NoticeModule } from './notice/notice.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
 	imports: [
@@ -18,6 +21,9 @@ import { BoardArticleModule } from './board-article/board-article.module';
 		ViewModule,
 		CommentModule,
 		FollowModule,
+		FaqModule,
+		NoticeModule,
+		NotificationModule,
 	],
 })// faqat modullarni jamlab beradi
 export class ComponentsModule {} // bu ko'prik vazifasida boshqa modullarni olib asosiy app modulga beradi mantiq soddalashadi

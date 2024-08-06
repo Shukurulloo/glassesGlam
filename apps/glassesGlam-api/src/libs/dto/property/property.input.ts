@@ -61,14 +61,14 @@ export class PricesRange {
 	end: number;
 }
 
-@InputType()
-export class SquaresRange {
-	@Field(() => Int)
-	start: number;
+// @InputType()
+// export class SquaresRange {
+// 	@Field(() => Int)
+// 	start: number;
 
-	@Field(() => Int)
-	end: number;
-}
+// 	@Field(() => Int)
+// 	end: number;
+// }
 
 @InputType()
 export class PeriodsRange {
