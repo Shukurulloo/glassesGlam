@@ -13,7 +13,6 @@ export class FaqService {
 
 	public async createFaq(memberId: ObjectId, input: FaqInputDto): Promise<FaqDto> {
 		input.memberId = memberId;
-
 		const result: FaqDto = await this.faqModel.create(input);
 
 		if (!result) throw new InternalServerErrorException(Message.CREATE_FAILED);

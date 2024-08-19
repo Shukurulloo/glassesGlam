@@ -1,10 +1,10 @@
 {
-	"name": "glassesGlam",
+	"name": "glassesglam",
 	"version": "0.0.1",
 	"description": "",
 	"author": "",
 	"private": true,
-	"license": "UNLICENSED",
+	"license": "ITC",
 	"scripts": {
 		"build": "nest build",
 		"format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
@@ -93,3 +93,5 @@
 		]
 	}
 }
+
+
